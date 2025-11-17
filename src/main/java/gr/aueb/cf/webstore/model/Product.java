@@ -25,4 +25,28 @@ public class Product extends AbstractEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductSpec> productSpecs = new HashSet<>();
 
+    @Column(nullable = false)
+    private String name;
+
+    @Column(length = 1000)
+    private String description;
+
+    @Column(nullable = false)
+    private Double price;
+
+    @Column
+    private Integer stock;
+
+    @Column
+    private Boolean isActive = true;
+
+    @Column(length = 10, nullable = false, unique = true)
+    private String sku;
+
+    @Column(length = 20)
+    private String brand;
+
+    @Column
+    private String image;
+
 }

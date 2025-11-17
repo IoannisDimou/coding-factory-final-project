@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@Table(name = "product_specs")
+@Table(name = "product_specs", uniqueConstraints = {@UniqueConstraint(columnNames = {"product_id", "value"})})
 public class ProductSpec extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,4 +18,12 @@ public class ProductSpec extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String value;
+
+
 }
