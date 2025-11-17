@@ -36,7 +36,7 @@ public class Payment extends AbstractEntity {
     private String cardLastFourDigits;
 
     @Column(nullable = false)
-    private String  cardBrand;
+    private String cardBrand;
 
     @Column(unique = true, nullable = false)
     private String transactionId;

@@ -3,5 +3,5 @@ package gr.aueb.cf.webstore.core.enums;
 public enum PaymentMethod {
     CREDIT_CARD,
     PAYPAL,
-    CASH
+    CASH_ON_DELIVERY
 }

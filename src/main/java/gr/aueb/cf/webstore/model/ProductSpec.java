@@ -25,5 +25,4 @@ public class ProductSpec extends AbstractEntity {
     @Column(nullable = false)
     private String value;
 
-
 }
