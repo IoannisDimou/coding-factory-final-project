@@ -32,7 +32,7 @@ public class Payment extends AbstractEntity {
     @Column(nullable = false)
     private Double amount;
 
-    @Column(length = 4, nullable = false)
+    @Column(length = 4)
     private String cardLastFourDigits;
 
     @Column(nullable = false)
