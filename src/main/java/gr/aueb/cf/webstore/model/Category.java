@@ -18,6 +18,10 @@ public class Category extends AbstractEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Product> product = new HashSet<>();
+    @OneToMany(mappedBy = "category")
+    private Set<Product> products = new HashSet<>();
+
+    @Column(nullable = false)
+    private String name;
+
 }

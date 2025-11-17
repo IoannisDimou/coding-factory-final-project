@@ -22,7 +22,7 @@ public class Product extends AbstractEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", orphanRemoval = true)
     private Set<ProductSpec> productSpecs = new HashSet<>();
 
     @Column(nullable = false)
@@ -43,7 +43,7 @@ public class Product extends AbstractEntity {
     @Column(length = 10, nullable = false, unique = true)
     private String sku;
 
-    @Column(length = 20)
+    @Column
     private String brand;
 
     @Column

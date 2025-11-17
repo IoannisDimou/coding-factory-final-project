@@ -49,7 +49,7 @@ public class User extends AbstractEntity {
         if (uuid == null) uuid = UUID.randomUUID().toString();
     }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     private Set<Order> orders = new HashSet<>();
 
     public Set<Order> getAllOrders() {
