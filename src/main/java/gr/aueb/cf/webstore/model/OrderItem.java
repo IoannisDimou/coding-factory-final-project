@@ -3,6 +3,8 @@ package gr.aueb.cf.webstore.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,16 +22,16 @@ public class OrderItem extends AbstractEntity{
     private Product product;
 
     @Column(nullable = false)
-    private Integer quantity;
+    private int quantity;
 
     @Column(nullable = false)
-    private Double price;
+    private BigDecimal price;
 
     @Column
-    private Double discount = 0.0;
+    private BigDecimal discount;
 
     @Column
-    private Double tax = 0.0;
+    private BigDecimal tax;
 
     public void setOrder(Order order) {
         this.order = order;
@@ -38,8 +40,16 @@ public class OrderItem extends AbstractEntity{
         }
     }
 
-    public Double getSubtotal() {
-        return (price * quantity) - discount + tax;
+    public BigDecimal getSubtotal() {
+
+        BigDecimal quant = BigDecimal.valueOf(quantity);
+        BigDecimal total = price.multiply(quant);
+
+        if (discount != null) total = total.subtract(discount);
+
+        if (tax != null) total = total.add(tax);
+
+        return total;
     }
 
 
