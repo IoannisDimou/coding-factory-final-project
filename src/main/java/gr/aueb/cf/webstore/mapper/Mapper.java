@@ -43,8 +43,17 @@ public class Mapper {
     }
 
     public User mapToUserEntity(UserUpdateDTO dto) {
+
         User user = new User();
+
         user.setId(dto.id());
+        user.setFirstname(dto.firstname());
+        user.setLastname(dto.lastname());
+        user.setPhoneNumber(dto.phoneNumber());
+        user.setEmail();
+        user.setPassword(passwordEncoder.encode(dto.password()));
+
+
     }
 
 }

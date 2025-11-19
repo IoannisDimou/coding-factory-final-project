@@ -8,6 +8,8 @@ public record UserUpdateDTO(
         String lastname,
         Role role,
         Boolean isActive,
-        String phoneNumber
+        String phoneNumber,
+        String password,
+        String email
 ) {}
 
