@@ -3,6 +3,7 @@ package gr.aueb.cf.webstore.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,10 +33,10 @@ public class Product extends AbstractEntity {
     private String description;
 
     @Column(nullable = false)
-    private Double price;
+    private BigDecimal price;
 
-    @Column
-    private Integer stock;
+    @Column(nullable = false)
+    private int stock;
 
     @Column
     private Boolean isActive = true;

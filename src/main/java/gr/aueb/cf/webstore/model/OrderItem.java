@@ -28,10 +28,10 @@ public class OrderItem extends AbstractEntity{
     private BigDecimal price;
 
     @Column
-    private BigDecimal discount;
+    private BigDecimal discount = BigDecimal.ZERO;
 
     @Column
-    private BigDecimal tax;
+    private BigDecimal tax = BigDecimal.ZERO;
 
     public void setOrder(Order order) {
         this.order = order;
@@ -51,6 +51,4 @@ public class OrderItem extends AbstractEntity{
 
         return total;
     }
-
-
 }

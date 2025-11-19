@@ -3,8 +3,7 @@ package gr.aueb.cf.webstore.model;
 import gr.aueb.cf.webstore.core.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +15,7 @@ import java.util.Set;
 @Builder
 @Table(name = "orders")
 public class Order extends AbstractEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,13 +34,11 @@ public class Order extends AbstractEntity {
     @Column(nullable = false)
     private OrderStatus status;
 
-
     @Column(nullable = false)
-    private Double totalPrice;
+    private BigDecimal totalPrice;
 
     @Embedded
     private Address shippingAddress;
-
 
     @PrePersist
     public void initialStatus() {

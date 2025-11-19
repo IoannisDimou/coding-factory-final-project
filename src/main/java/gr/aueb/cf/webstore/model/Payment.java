@@ -5,6 +5,8 @@ import gr.aueb.cf.webstore.core.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,7 +32,7 @@ public class Payment extends AbstractEntity {
     private PaymentStatus status;
 
     @Column(nullable = false)
-    private Double amount;
+    private BigDecimal amount;
 
     @Column(length = 4)
     private String cardLastFourDigits;

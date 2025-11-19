@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@Table(name = "product_specs", uniqueConstraints = {@UniqueConstraint(columnNames = {"product_id", "value"})})
+@Table(name = "product_specs")
 public class ProductSpec extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,10 +6,10 @@ import jakarta.validation.constraints.*;
 
 @EmailOrPhone
 public record UserInsertDTO(
-        @NotEmpty(message = "First name is required")
+        @NotBlank(message = "First value is required")
         String firstname,
 
-        @NotEmpty(message = "Last name is required")
+        @NotBlank(message = "Last value is required")
         String lastname,
 
         @Email(message = "Invalid email")
@@ -22,6 +22,6 @@ public record UserInsertDTO(
                 message = "Invalid Password")
         String password,
 
-        @NotNull(message = "Role is required")
+        @NotBlank(message = "Role is required")
         Role role
 ) {}
