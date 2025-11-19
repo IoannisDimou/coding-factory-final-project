@@ -1,8 +1,11 @@
 package gr.aueb.cf.webstore.dto;
 
+import lombok.Builder;
+
 import java.math.BigDecimal;
 import java.util.List;
 
+@Builder
 public record ProductReadOnlyDTO(
         Long id,
         String name,

@@ -23,5 +23,7 @@ public record UserInsertDTO(
         String password,
 
         @NotBlank(message = "Role is required")
-        Role role
+        Role role,
+
+        boolean isActive
 ) {}

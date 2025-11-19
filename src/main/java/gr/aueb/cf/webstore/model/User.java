@@ -44,6 +44,9 @@ public class User extends AbstractEntity {
     @Column(nullable = true, unique = true)
     private String phoneNumber;
 
+    @Column(nullable = false)
+    private String password;
+
     @PrePersist
     public void initializeUUID() {
         if (uuid == null) uuid = UUID.randomUUID().toString();
