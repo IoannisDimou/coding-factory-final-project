@@ -2,6 +2,7 @@ package gr.aueb.cf.webstore.mapper;
 
 import gr.aueb.cf.webstore.dto.UserInsertDTO;
 import gr.aueb.cf.webstore.dto.UserReadOnlyDTO;
+import gr.aueb.cf.webstore.dto.UserUpdateDTO;
 import gr.aueb.cf.webstore.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,9 +35,16 @@ public class Mapper {
         user.setFirstname(dto.firstname());
         user.setLastname(dto.lastname());
         user.setEmail(dto.email());
-        user.
+        user.setPhoneNumber(dto.phoneNumber());
+        user.setPassword(passwordEncoder.encode(dto.password()));
+        user.setRole(dto.role());
 
+        return user;
+    }
 
+    public User mapToUserEntity(UserUpdateDTO dto) {
+        User user = new User();
+        user.setId(dto.id());
     }
 
 }
