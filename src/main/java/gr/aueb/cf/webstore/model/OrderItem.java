@@ -13,6 +13,11 @@ import java.math.BigDecimal;
 @Builder
 @Table(name = "order_items")
 public class OrderItem extends AbstractEntity{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
