@@ -9,6 +9,8 @@ public record ProductUpdateDTO(
         Boolean isActive,
         String description,
         String brand,
-        String image
+        String image,
+        String name,
+        String sku
 ) {}
 
