@@ -5,6 +5,7 @@ import gr.aueb.cf.webstore.model.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
@@ -13,5 +14,5 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
     List<Order> findByStatus(OrderStatus status);
 
-    List<Order> findByTotalPrice(Double min, Double max);
+    List<Order> findByTotalPrice(BigDecimal min, BigDecimal max);
 }

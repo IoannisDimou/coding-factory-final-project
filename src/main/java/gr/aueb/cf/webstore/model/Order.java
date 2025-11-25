@@ -24,10 +24,10 @@ public class Order extends AbstractEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "order", orphanRemoval = true)
+    @OneToMany(mappedBy = "order", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<OrderItem> orderItems = new HashSet<>();
 
-    @OneToMany(mappedBy = "order", orphanRemoval = true)
+    @OneToMany(mappedBy = "order", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Payment> payments = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
@@ -35,7 +35,13 @@ public class Order extends AbstractEntity {
     private OrderStatus status;
 
     @Column(nullable = false)
-    private BigDecimal totalPrice;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
+
+    public BigDecimal calculateTotal() {
+        return orderItems.stream()
+                .map(OrderItem::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
     @Embedded
     private Address shippingAddress;

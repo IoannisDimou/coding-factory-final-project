@@ -55,7 +55,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AppObjectNotAuthorizedException.class)
-    public ResponseEntity<ResponseMessageDTO> handleConstraintViolationException(AppObjectNotFoundException e, WebRequest request) {
+    public ResponseEntity<ResponseMessageDTO> handleConstraintViolationException(AppObjectNotAuthorizedException e, WebRequest request) {
         log.warn("Authorization failed for URI= {}. Message = {}", request.getDescription(false), e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)

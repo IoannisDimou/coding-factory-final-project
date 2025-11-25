@@ -23,7 +23,7 @@ public class Product extends AbstractEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy = "product", orphanRemoval = true)
+    @OneToMany(mappedBy = "product", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<ProductSpec> productSpecs = new HashSet<>();
 
     @Column(nullable = false)

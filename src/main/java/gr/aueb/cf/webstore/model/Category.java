@@ -21,7 +21,10 @@ public class Category extends AbstractEntity {
     @OneToMany(mappedBy = "category")
     private Set<Product> products = new HashSet<>();
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
 
 }

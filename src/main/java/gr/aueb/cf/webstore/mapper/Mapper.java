@@ -1,11 +1,7 @@
 package gr.aueb.cf.webstore.mapper;
 
 import gr.aueb.cf.webstore.dto.*;
-import gr.aueb.cf.webstore.model.Category;
-import gr.aueb.cf.webstore.model.Payment;
-import gr.aueb.cf.webstore.model.Product;
-import gr.aueb.cf.webstore.model.User;
-import gr.aueb.cf.webstore.model.Order;
+import gr.aueb.cf.webstore.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -46,27 +42,27 @@ public class Mapper {
         return user;
     }
 
-    public User mapToUserEntity(UserUpdateDTO dto) {
+    public User mapToUserEntity(UserUpdateDTO dto, User existingUser) {
 
-        User user = new User();
+        existingUser.setFirstname(dto.firstname());
+        existingUser.setLastname(dto.lastname());
+        existingUser.setPhoneNumber(dto.phoneNumber());
+        existingUser.setEmail(dto.email());
+        existingUser.setRole(dto.role());
+        existingUser.setIsActive(dto.isActive());
+        if (dto.password() != null && !dto.password().isBlank()) {
+            existingUser.setPassword(passwordEncoder.encode(dto.password()));
+        }
 
-        user.setId(dto.id());
-        user.setFirstname(dto.firstname());
-        user.setLastname(dto.lastname());
-        user.setPhoneNumber(dto.phoneNumber());
-        user.setEmail(dto.email());
-        user.setRole(dto.role());
-        user.setIsActive(dto.isActive());
-        user.setPassword(passwordEncoder.encode(dto.password()));
-
-        return user;
+        return existingUser;
     }
 
     public ProductReadOnlyDTO mapToProductReadOnlyDTO(Product product) {
 
         CategoryReadOnlyDTO categoryReadOnlyDTO = new CategoryReadOnlyDTO(
                 product.getCategory().getId(),
-                product.getCategory().getName()
+                product.getCategory().getName(),
+                product.getCategory().getIsActive()
         );
 
         List<ProductSpecReadOnlyDTO> specsDTO = product.getProductSpecs()
@@ -136,13 +132,15 @@ public class Mapper {
 
         category.setId(dto.id());
         category.setName(dto.name());
+        category.setIsActive(dto.isActive());
         return category;
     }
 
     public CategoryReadOnlyDTO mapToCategoryReadOnlyDTO(Category category) {
         return new CategoryReadOnlyDTO(
                 category.getId(),
-                category.getName()
+                category.getName(),
+                category.getIsActive()
         );
     }
 
@@ -162,6 +160,15 @@ public class Mapper {
         );
     }
 
+    public AddressDTO mapToAddressDTO(Address address) {
+        if (address == null) return null;
+        return new AddressDTO(
+                address.getStreet(),
+                address.getCity(),
+                address.getZipcode(),
+                address.getCountry()
+        );
+    }
 
     public OrderReadOnlyDTO mapToOrderReadOnlyDTO(Order order) {
 
@@ -205,11 +212,11 @@ public class Mapper {
         return new OrderReadOnlyDTO(
                 order.getId(),
                 userReadOnlyDTO,
-                order.getShippingAddress(),
+                mapToAddressDTO(order.getShippingAddress()),
                 itemsDTO,
                 paymentsDTO,
                 order.getTotalPrice(),
-                order.getStatus().name()
+                order.getStatus()
         );
     }
 

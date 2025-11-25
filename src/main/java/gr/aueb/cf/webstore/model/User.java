@@ -1,6 +1,7 @@
 package gr.aueb.cf.webstore.model;
 
 import gr.aueb.cf.webstore.core.enums.Role;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -29,8 +30,8 @@ public class User extends AbstractEntity {
     @Column(nullable = false)
     private Role role;
 
-    @ColumnDefault("true")
-    private Boolean isActive;
+    @Column(nullable = false)
+    private Boolean isActive = true;
 
     @Column(nullable = false)
     private String firstname;

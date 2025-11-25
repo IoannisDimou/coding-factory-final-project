@@ -1,6 +1,6 @@
 package gr.aueb.cf.webstore.dto;
 
-import gr.aueb.cf.webstore.model.Address;
+import gr.aueb.cf.webstore.core.enums.OrderStatus;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -10,9 +10,9 @@ import java.util.List;
 public record OrderReadOnlyDTO(
         Long id,
         UserReadOnlyDTO user,
-        Address shippingAddress,
+        AddressDTO shippingAddress,
         List<OrderItemReadOnlyDTO> items,
         List<PaymentReadOnlyDTO> payments,
         BigDecimal totalPrice,
-        String status
+        OrderStatus status
 ) {}
