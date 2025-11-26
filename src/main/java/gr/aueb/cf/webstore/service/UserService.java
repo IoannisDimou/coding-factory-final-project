@@ -2,6 +2,9 @@ package gr.aueb.cf.webstore.service;
 
 import gr.aueb.cf.webstore.core.exceptions.AppObjectAlreadyExists;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
+import gr.aueb.cf.webstore.core.filters.Paginated;
+import gr.aueb.cf.webstore.core.filters.UserFilters;
+import gr.aueb.cf.webstore.core.specifications.UserSpecification;
 import gr.aueb.cf.webstore.dto.UserInsertDTO;
 import gr.aueb.cf.webstore.dto.UserReadOnlyDTO;
 import gr.aueb.cf.webstore.dto.UserUpdateDTO;
@@ -11,6 +14,11 @@ import gr.aueb.cf.webstore.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,7 +42,7 @@ public class UserService implements IUserService {
             throw new AppObjectAlreadyExists("Email", "User with email " + userInsertDTO.email() + " already exists");
         }
 
-        if (userRepository.findByPhoneNumber(userInsertDTO.phoneNumber()).isPresent()) {
+        if (userInsertDTO.phoneNumber() != null && userRepository.findByPhoneNumber(userInsertDTO.phoneNumber()).isPresent()) {
             throw new AppObjectAlreadyExists("PhoneNumber", "User with phone " + userInsertDTO.phoneNumber() + " already exists");
         }
 
@@ -52,24 +60,61 @@ public class UserService implements IUserService {
     @Transactional(rollbackOn = Exception.class)
     public UserReadOnlyDTO updateUser(UserUpdateDTO userUpdateDTO) throws AppObjectAlreadyExists, AppObjectNotFoundException {
 
-        User existingUser = userRepository.findById(userUpdateDTO.id()).orElse(null);
-        if (existingUser == null) throw new AppObjectNotFoundException("User", "User with id=" + userUpdateDTO.id() + " not found");
+        User existingUser = userRepository.findById(userUpdateDTO.id()).orElseThrow(
+                () -> new AppObjectNotFoundException("User", "User with id " + userUpdateDTO.id() + " not found"));
 
-
-        if (userRepository.findById(userUpdateDTO.id()).isEmpty()) {
-            throw new AppObjectNotFoundException("User", "User with id " + userUpdateDTO.id() + " not found");
-        }
-
-        if (existingUser == null) throw new AppObjectNotFoundException("User", "User with id=" + userUpdateDTO.id() + " not found");
-
-        if(!existingUser.getEmail().equals(userUpdateDTO.email()) && userRepository.findByEmail(userUpdateDTO.email()).isPresent()) {
+        if(!userUpdateDTO.email().equals(existingUser.getEmail()) && userRepository.findByEmail(userUpdateDTO.email()).isPresent()) {
             throw new AppObjectAlreadyExists("Email", "User with email " + userUpdateDTO.email() + " already exists");
         }
 
-        if (!userUpdateDTO.phoneNumber().equals(existingUser.getPhoneNumber()) && userRepository.findByPhoneNumber(userUpdateDTO.phoneNumber()).isPresent()) {
-            throw new AppObjectAlreadyExists("PhoneNumber", "User with phone " + userUpdateDTO.phoneNumber() + " already exists");
+        if (userUpdateDTO.phoneNumber() != null && !userUpdateDTO.phoneNumber().equals(existingUser.getPhoneNumber()) &&
+                userRepository.findByPhoneNumber(userUpdateDTO.phoneNumber()).isPresent()) { throw new AppObjectAlreadyExists(
+                        "PhoneNumber", "User with phone " + userUpdateDTO.phoneNumber() + " already exists");
         }
 
-        return mapper.mapToUserReadOnlyDTO(existingUser);
+        mapper.mapToUserEntity(userUpdateDTO, existingUser);
+        User updatedUser = userRepository.save(existingUser);
+        log.info("User with id={} updated successfully.", updatedUser.getId());
+
+        return mapper.mapToUserReadOnlyDTO(updatedUser);
+
     }
+
+    @Override
+    public UserReadOnlyDTO getUser(String uuid) throws AppObjectNotFoundException {
+        return userRepository.findByUuid(uuid)
+                .map(mapper::mapToUserReadOnlyDTO)
+                .orElseThrow(() -> new AppObjectNotFoundException("User", "User with uuid " + uuid + " not found"));
+    }
+
+    @Override
+    public Paginated<UserReadOnlyDTO> getPaginatedUsers(int page, int size) {
+        String defaultSort = "id";
+        Pageable pageable = PageRequest.of(page, size, Sort.by(defaultSort).ascending());
+
+        Page<User> pagedUsers = userRepository.findAll(pageable);
+        log.debug("Paginated users returned successfully with page={} and size={}", page, size);
+
+        return Paginated.fromPage(pagedUsers.map(mapper::mapToUserReadOnlyDTO));
+    }
+
+    @Override
+    public Paginated<UserReadOnlyDTO> getUsersFilteredPaginated(UserFilters userFilters) {
+        var filtered = userRepository.findAll(getSpecsFromFilters(userFilters), userFilters.getPageable());
+
+        log.debug("Filtered and paginated users returned successfully with page={} and size={}", userFilters.getPage(),
+                userFilters.getPageSize());
+
+        return Paginated.fromPage(filtered.map(mapper::mapToUserReadOnlyDTO));
+    }
+
+    private Specification<User> getSpecsFromFilters(UserFilters filters) {
+        return UserSpecification.stringFieldLike("uuid", filters.getUuid())
+                .and(UserSpecification.stringFieldLike("firstname", filters.getFirstname()))
+                .and(UserSpecification.stringFieldLike("lastname", filters.getLastname()))
+                .and(UserSpecification.stringFieldLike("email", filters.getEmail()))
+                .and(UserSpecification.userIsActive(filters.getIsActive()))
+                .and(UserSpecification.userRoleIs(filters.getRole()));
+    }
+
 }

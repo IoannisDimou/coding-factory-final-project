@@ -1,10 +1,8 @@
 package gr.aueb.cf.webstore.dto;
 
 import gr.aueb.cf.webstore.core.enums.Role;
-import gr.aueb.cf.webstore.validator.EmailOrPhone;
 import jakarta.validation.constraints.*;
 
-@EmailOrPhone
 public record UserInsertDTO(
         @NotBlank(message = "First value is required")
         String firstname,
@@ -12,6 +10,7 @@ public record UserInsertDTO(
         @NotBlank(message = "Last value is required")
         String lastname,
 
+        @NotNull(message = "Email is required")
         @Email(message = "Invalid email")
         String email,
 
