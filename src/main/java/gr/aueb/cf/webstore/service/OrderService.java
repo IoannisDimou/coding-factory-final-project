@@ -1,0 +1,149 @@
+package gr.aueb.cf.webstore.service;
+
+import gr.aueb.cf.webstore.core.enums.OrderStatus;
+import gr.aueb.cf.webstore.core.exceptions.AppObjectInvalidArgumentException;
+import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
+import gr.aueb.cf.webstore.core.filters.OrderFilters;
+import gr.aueb.cf.webstore.core.filters.Paginated;
+import gr.aueb.cf.webstore.dto.*;
+import gr.aueb.cf.webstore.mapper.Mapper;
+import gr.aueb.cf.webstore.model.*;
+import gr.aueb.cf.webstore.repository.OrderRepository;
+import gr.aueb.cf.webstore.repository.ProductRepository;
+import gr.aueb.cf.webstore.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+public class OrderService implements  IOrderService {
+
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final Mapper mapper;
+
+    @Autowired
+    public OrderService(OrderRepository orderRepository, Mapper mapper, UserRepository userRepository, ProductRepository productRepository) {
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
+        this.mapper = mapper;
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public OrderReadOnlyDTO createOrder(OrderInsertDTO orderInsertDTO) throws AppObjectNotFoundException, AppObjectInvalidArgumentException {
+
+        if (orderInsertDTO.items() == null || orderInsertDTO.items().isEmpty()) throw new AppObjectInvalidArgumentException(
+                    "Order", "Order must contain at least one item");
+
+        if (orderInsertDTO.shippingAddress() == null) throw new AppObjectInvalidArgumentException("Address", "Shipping address is required");
+
+        User user = userRepository.findById(orderInsertDTO.userId()).orElseThrow(() -> new AppObjectNotFoundException(
+                        "User", "User with id " + orderInsertDTO.userId() + " not found"));
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setStatus(OrderStatus.PENDING);
+
+        AddressDTO addrDto = orderInsertDTO.shippingAddress();
+
+        Address address = new Address(
+                addrDto.street(),
+                addrDto.city(),
+                addrDto.zipcode(),
+                addrDto.country()
+        );
+
+        order.setShippingAddress(address);
+
+        for (OrderItemInsertDTO itemDTO : orderInsertDTO.items()) {
+
+            Product product = productRepository.findById(itemDTO.productId()).orElseThrow(() -> new AppObjectNotFoundException(
+                            "Product", "Product with id " + itemDTO.productId() + " not found"));
+
+            if (Boolean.FALSE.equals(product.getIsActive())) throw new AppObjectInvalidArgumentException("Product",
+                    "Product with id " + product.getId() + " is inactive");
+
+            if (product.getStock() < itemDTO.quantity()) throw new AppObjectInvalidArgumentException(
+                        "Stock", "Insufficient stock for product " + product.getId());
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setProduct(product);
+            orderItem.setQuantity(itemDTO.quantity());
+            orderItem.setPrice(product.getPrice());
+
+            order.addOrderItem(orderItem);
+
+            product.setStock(product.getStock() - itemDTO.quantity());
+        }
+
+        order.setTotalPrice(order.calculateTotal());
+
+        Order savedOrder = orderRepository.save(order);
+
+        log.info("Order created successfully. id={}, userId={}", savedOrder.getId(), user.getId());
+
+        return mapper.mapToOrderReadOnlyDTO(savedOrder);
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public OrderReadOnlyDTO updateOrderStatus(OrderUpdateDTO orderUpdateDTO) throws AppObjectNotFoundException, AppObjectInvalidArgumentException {
+
+        if (orderUpdateDTO.status() == null) throw new AppObjectInvalidArgumentException("OrderStatus", "Order status is required");
+
+        Order existingOrder = orderRepository.findById(orderUpdateDTO.id()).orElseThrow(() -> new AppObjectNotFoundException(
+                        "Order",
+                        "Order with id " + orderUpdateDTO.id() + " not found"));
+
+        existingOrder.setStatus(orderUpdateDTO.status());
+
+        Order updatedOrder = orderRepository.save(existingOrder);
+
+        log.info("Order with id={} updated successfully to status={}.", updatedOrder.getId(), updatedOrder.getStatus());
+
+        return mapper.mapToOrderReadOnlyDTO(updatedOrder);
+    }
+
+    @Override
+    public OrderReadOnlyDTO getOneOrder(Long id) throws AppObjectNotFoundException {
+
+        return orderRepository.findById(id)
+                .map(mapper::mapToOrderReadOnlyDTO)
+                .orElseThrow(() -> new AppObjectNotFoundException(
+                        "Order",
+                        "Order with id " + id + " not found"
+                ));
+    }
+
+    @Override
+    public Paginated<OrderReadOnlyDTO> getPaginatedOrders(int page, int size) {
+
+        String defaultSort = "id";
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(defaultSort).ascending());
+        Page<Order> pagedOrders = orderRepository.findAll(pageable);
+
+        log.debug("Paginated orders returned successfully with page={} and size={}", page, size);
+
+        return Paginated.fromPage(pagedOrders.map(mapper::mapToOrderReadOnlyDTO));
+    }
+
+    @Override
+    public Paginated<OrderReadOnlyDTO> getOrdersFilteredPaginated(OrderFilters orderFilters) {
+
+        var page = orderRepository.findAll(orderFilters.getPageable());
+
+        log.debug("Filtered and paginated orders returned successfully with page={} and size={}", orderFilters.getPage(), orderFilters.getPageSize());
+
+        return Paginated.fromPage(page.map(mapper::mapToOrderReadOnlyDTO));
+    }
+}
