@@ -10,5 +10,5 @@ public interface ITwoFactorService {
     TwoFactorChallengeDTO createTwoFactorChallenge(String email, String deliveryMethod) throws AppObjectNotFoundException,
             AppObjectInvalidArgumentException;
 
-    boolean verifyTwoFactorCode(TwoFactorVerificationRequestDTO request) throws AppObjectInvalidArgumentException;
+    String verifyTwoFactorCode(TwoFactorVerificationRequestDTO request) throws AppObjectInvalidArgumentException;
 }

@@ -90,7 +90,7 @@ public class TwoFactorService implements ITwoFactorService {
     }
 
     @Override
-    public boolean verifyTwoFactorCode(TwoFactorVerificationRequestDTO request) throws AppObjectInvalidArgumentException {
+    public String verifyTwoFactorCode(TwoFactorVerificationRequestDTO request) throws AppObjectInvalidArgumentException {
 
         String token = request.twoFactorToken();
         String code = request.code();
@@ -133,6 +133,6 @@ public class TwoFactorService implements ITwoFactorService {
 
         log.info("2FA verification succeeded for email={} with token={}", entry.email(), token);
 
-        return true;
+        return entry.email();
     }
 }
