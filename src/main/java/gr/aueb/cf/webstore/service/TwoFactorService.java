@@ -24,7 +24,8 @@ import java.util.UUID;
 public class TwoFactorService implements ITwoFactorService {
 
     private static final Duration DEFAULT_TTL = Duration.ofMinutes(5);
-    private static final String KEY_PREFIX = "2fa:";
+    private static final String KEY = "2fa:";
+    private static final String EMAIL_KEY = "2fa:email:";
 
     private final UserRepository userRepository;
     private final IEmailService emailService;
@@ -65,11 +66,13 @@ public class TwoFactorService implements ITwoFactorService {
 
         TwoFactorRedisDTO entry = new TwoFactorRedisDTO(user.getEmail(), code);
 
-        String key = KEY_PREFIX + token;
+        String key = KEY + token;
+        String emailKey = EMAIL_KEY + user.getEmail();
 
         try {
             String json = objectMapper.writeValueAsString(entry);
             redisTemplate.opsForValue().set(key, json, DEFAULT_TTL);
+            redisTemplate.opsForValue().set(emailKey, token, DEFAULT_TTL);
         } catch (JsonProcessingException e) {
             log.error("Failed to serialize TwoFactorRedisDTO", e);
             throw new AppObjectInvalidArgumentException("TwoFactor", "Failed to create two-factor challenge");
@@ -98,7 +101,7 @@ public class TwoFactorService implements ITwoFactorService {
         if (code == null || code.isBlank())
             throw new AppObjectInvalidArgumentException("TwoFactor", "Two-factor code is required");
 
-        String key = KEY_PREFIX + token;
+        String key = KEY + token;
         String json = redisTemplate.opsForValue().get(key);
 
         if (json == null)
@@ -114,11 +117,19 @@ public class TwoFactorService implements ITwoFactorService {
             throw new AppObjectInvalidArgumentException("TwoFactor", "Invalid two-factor token");
         }
 
+        String emailKey = EMAIL_KEY + entry.email();
+        String latestTokenForEmail = redisTemplate.opsForValue().get(emailKey);
+
+        if (latestTokenForEmail == null || !latestTokenForEmail.equals(token)) {
+            throw new AppObjectInvalidArgumentException("TwoFactor", "Invalid two-factor token");
+        }
+
         if (!entry.code().equals(code)) {
             throw new AppObjectInvalidArgumentException("TwoFactor", "Invalid two-factor code");
         }
 
         redisTemplate.delete(key);
+        redisTemplate.delete(emailKey);
 
         log.info("2FA verification succeeded for email={} with token={}", entry.email(), token);
 
