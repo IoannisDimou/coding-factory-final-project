@@ -5,6 +5,7 @@ import gr.aueb.cf.webstore.core.exceptions.AppObjectInvalidArgumentException;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
 import gr.aueb.cf.webstore.core.filters.Paginated;
 import gr.aueb.cf.webstore.core.filters.ProductFilters;
+import gr.aueb.cf.webstore.core.specifications.ProductSpecification;
 import gr.aueb.cf.webstore.dto.*;
 import gr.aueb.cf.webstore.mapper.Mapper;
 import gr.aueb.cf.webstore.model.Category;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -119,11 +121,20 @@ public class ProductService implements IProductService {
     @Override
     public Paginated<ProductReadOnlyDTO> getProductsFilteredPaginated(ProductFilters productFilters) {
 
-        var filtered = productRepository.findAll(productFilters.getPageable());
+        var filtered = productRepository.findAll(getSpecsFromFilters(productFilters), productFilters.getPageable());
 
         log.debug("Filtered and paginated products returned successfully with page={} and size={}", productFilters.getPage(), productFilters.getPageSize());
 
         return Paginated.fromPage(filtered.map(mapper::mapToProductReadOnlyDTO));
+    }
+
+    private Specification<Product> getSpecsFromFilters(ProductFilters filters) {
+
+        return ProductSpecification.stringFieldLike("name", filters.getName())
+                .and(ProductSpecification.categoryNameLike(filters.getCategory()))
+                .and(ProductSpecification.priceBetween(filters.getMinPrice(), filters.getMaxPrice()))
+                .and(ProductSpecification.brandLike(filters.getBrand()))
+                .and(ProductSpecification.specLike(filters.getSpecName(), filters.getSpecValue()));
     }
 
     @Override

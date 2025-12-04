@@ -25,4 +25,13 @@ public class ProductFilters extends GenericFilters {
     @Nullable
     private BigDecimal maxPrice;
 
+    @Nullable
+    private String brand;
+
+    @Nullable
+    private String specName;
+
+    @Nullable
+    private String specValue;
+
 }
