@@ -2,6 +2,7 @@ package gr.aueb.cf.webstore.service;
 
 import gr.aueb.cf.webstore.core.exceptions.AppObjectInvalidArgumentException;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
+import gr.aueb.cf.webstore.core.filters.Paginated;
 import gr.aueb.cf.webstore.dto.PaymentConfirmationDTO;
 import gr.aueb.cf.webstore.dto.PaymentReadOnlyDTO;
 import gr.aueb.cf.webstore.dto.PaymentRequestDTO;

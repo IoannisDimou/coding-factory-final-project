@@ -81,7 +81,8 @@ public class UserRestController {
             responses = {
                     @ApiResponse(
                             responseCode = "200", description = "Users returned",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Paginated.class,
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = Paginated.class,
                                     example = """
                                             {
                                               "data": [
@@ -97,7 +98,7 @@ public class UserRestController {
                                                 }
                                               ],
                                               "currentPage": 0,
-                                              "pageSize": 20,
+                                              "pageSize": 10,
                                               "totalPages": 5,
                                               "numberOfElements": 1,
                                               "totalElements": 100
@@ -113,7 +114,7 @@ public class UserRestController {
             }
     )
     @GetMapping("/users")
-    public ResponseEntity<Paginated<UserReadOnlyDTO>> getPaginatedUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+    public ResponseEntity<Paginated<UserReadOnlyDTO>> getPaginatedUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
 
         Paginated<UserReadOnlyDTO> usersPage = userService.getPaginatedUsers(page, size);
 
@@ -142,7 +143,7 @@ public class UserRestController {
                                                 }
                                               ],
                                               "currentPage": 0,
-                                              "pageSize": 20,
+                                              "pageSize": 10,
                                               "totalPages": 5,
                                               "numberOfElements": 1,
                                               "totalElements": 100
