@@ -46,8 +46,8 @@ public class OrderService implements  IOrderService {
 
         if (orderInsertDTO.shippingAddress() == null) throw new AppObjectInvalidArgumentException("Address", "Shipping address is required");
 
-        User user = userRepository.findById(orderInsertDTO.userId()).orElseThrow(() -> new AppObjectNotFoundException(
-                        "User", "User with id " + orderInsertDTO.userId() + " not found"));
+        User user = userRepository.findByUuid(orderInsertDTO.userUuid()).orElseThrow(() -> new AppObjectNotFoundException(
+                        "User", "User with uuid " + orderInsertDTO.userUuid() + " not found"));
 
         Order order = new Order();
         order.setUser(user);
@@ -89,7 +89,7 @@ public class OrderService implements  IOrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        log.info("Order created successfully. id={}, userId={}", savedOrder.getId(), user.getId());
+        log.info("Order created successfully. id={}, userId={}, userUuid={}", savedOrder.getId(), user.getId(), user.getUuid());
 
         return mapper.mapToOrderReadOnlyDTO(savedOrder);
     }

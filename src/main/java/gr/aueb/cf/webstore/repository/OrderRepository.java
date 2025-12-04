@@ -4,7 +4,6 @@ import gr.aueb.cf.webstore.core.enums.OrderStatus;
 import gr.aueb.cf.webstore.model.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
 import java.math.BigDecimal;
 import java.util.List;
 

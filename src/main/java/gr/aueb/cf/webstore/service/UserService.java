@@ -60,8 +60,8 @@ public class UserService implements IUserService {
     @Transactional(rollbackOn = Exception.class)
     public UserReadOnlyDTO updateUser(UserUpdateDTO userUpdateDTO) throws AppObjectAlreadyExists, AppObjectNotFoundException {
 
-        User existingUser = userRepository.findById(userUpdateDTO.id()).orElseThrow(
-                () -> new AppObjectNotFoundException("User", "User with id " + userUpdateDTO.id() + " not found"));
+        User existingUser = userRepository.findByUuid(userUpdateDTO.uuid()).orElseThrow(
+                () -> new AppObjectNotFoundException("User", "User with uuid " + userUpdateDTO.uuid() + " not found"));
 
         if(!userUpdateDTO.email().equals(existingUser.getEmail()) && userRepository.findByEmail(userUpdateDTO.email()).isPresent()) {
             throw new AppObjectAlreadyExists("Email", "User with email " + userUpdateDTO.email() + " already exists");

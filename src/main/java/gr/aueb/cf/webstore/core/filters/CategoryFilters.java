@@ -1,6 +1,5 @@
 package gr.aueb.cf.webstore.core.filters;
 
-import lombok.*;
 import org.springframework.lang.Nullable;
 
 public class CategoryFilters extends GenericFilters {

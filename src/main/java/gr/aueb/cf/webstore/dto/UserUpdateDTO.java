@@ -7,7 +7,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record UserUpdateDTO(
-        Long id,
+
+        @NotBlank(message = "UUID is required")
+        String uuid,
+
         String firstname,
         String lastname,
 

@@ -21,7 +21,7 @@ public class OrderFilters extends GenericFilters {
     private String orderId;
 
     @Nullable
-    private String uuid;
+    private String userUuid;
 
     @Nullable
     private LocalDate dateFrom;

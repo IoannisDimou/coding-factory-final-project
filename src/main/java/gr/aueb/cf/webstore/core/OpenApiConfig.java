@@ -1,7 +1,6 @@
 package gr.aueb.cf.webstore.core;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -12,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @SecurityScheme(
-        name= "Bearer authentication",
+        name= "Bearer Authentication",
         type= SecuritySchemeType.HTTP,
         bearerFormat = "JWT",
         scheme = "bearer"
