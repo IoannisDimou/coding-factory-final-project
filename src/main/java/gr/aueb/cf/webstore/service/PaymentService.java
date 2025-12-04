@@ -5,6 +5,7 @@ import gr.aueb.cf.webstore.core.enums.PaymentMethod;
 import gr.aueb.cf.webstore.core.enums.PaymentStatus;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectInvalidArgumentException;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
+import gr.aueb.cf.webstore.core.filters.Paginated;
 import gr.aueb.cf.webstore.dto.PaymentConfirmationDTO;
 import gr.aueb.cf.webstore.dto.PaymentReadOnlyDTO;
 import gr.aueb.cf.webstore.dto.PaymentRequestDTO;
@@ -16,6 +17,10 @@ import gr.aueb.cf.webstore.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
@@ -163,6 +168,18 @@ public class PaymentService implements IPaymentService {
 
     private boolean isAllowedTestCard(String normalized) {
         return ALLOWED_TEST_CARDS.contains(normalized);
+    }
+
+    @Override
+    public Paginated<PaymentReadOnlyDTO> getPaginatedPayments(int page, int size) {
+
+        String defaultSort = "id";
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(defaultSort).descending());
+
+        Page<Payment> payments = paymentRepository.findAll(pageable);
+
+        return Paginated.fromPage(payments.map(mapper::mapToPaymentReadOnlyDTO));
     }
 
 }

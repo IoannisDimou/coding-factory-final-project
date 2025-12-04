@@ -18,4 +18,6 @@ public interface IPaymentService {
     PaymentReadOnlyDTO getPayment(Long id) throws AppObjectNotFoundException;
 
     List<PaymentReadOnlyDTO> getPaymentsForOrder(Long orderId) throws AppObjectNotFoundException;
+
+    Paginated<PaymentReadOnlyDTO> getPaginatedPayments(int page, int size);
 }
