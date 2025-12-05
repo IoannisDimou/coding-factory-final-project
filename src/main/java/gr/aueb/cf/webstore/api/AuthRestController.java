@@ -27,7 +27,7 @@ public class AuthRestController {
     private final AuthenticationService authenticationService;
 
     @Operation(
-            summary = "Start authentication (password + 2FA)",
+            summary = "Start authentication",
             description = "Checks email/password and sends a 2FA code to the user's email. " +
                     "Returns a two-factor token that must be used in the next step.",
             responses = {

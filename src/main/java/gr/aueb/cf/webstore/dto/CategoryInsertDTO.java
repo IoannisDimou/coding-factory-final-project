@@ -1,12 +1,14 @@
 package gr.aueb.cf.webstore.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CategoryInsertDTO(
 
         @NotBlank(message = "Category name is required")
         String name,
 
+        @NotNull(message = "isActive field is required")
         Boolean isActive
 ) {}
 

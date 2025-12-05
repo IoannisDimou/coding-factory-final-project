@@ -13,5 +13,5 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
     List<Order> findByStatus(OrderStatus status);
 
-    List<Order> findByTotalPrice(BigDecimal min, BigDecimal max);
+    List<Order> findByTotalPriceBetween(BigDecimal min, BigDecimal max);
 }

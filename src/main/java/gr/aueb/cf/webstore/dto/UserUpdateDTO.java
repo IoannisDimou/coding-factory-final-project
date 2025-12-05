@@ -11,12 +11,16 @@ public record UserUpdateDTO(
         @NotBlank(message = "UUID is required")
         String uuid,
 
+        @NotBlank(message = "First value is required")
         String firstname,
+
+        @NotBlank(message = "Last value is required")
         String lastname,
 
         @NotNull(message = "Role is required")
         Role role,
 
+        @NotNull(message = "isActive field is required")
         Boolean isActive,
 
         @Pattern(regexp = "^[0-9]{10}$", message = "Invalid phone number")

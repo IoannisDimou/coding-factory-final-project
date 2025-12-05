@@ -24,5 +24,6 @@ public record UserInsertDTO(
         @NotNull(message = "Role is required")
         Role role,
 
-        boolean isActive
+        @NotNull(message = "isActive field is required")
+        Boolean isActive
 ) {}

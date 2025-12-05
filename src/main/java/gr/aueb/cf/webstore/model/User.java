@@ -3,6 +3,7 @@ package gr.aueb.cf.webstore.model;
 import gr.aueb.cf.webstore.core.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,8 +29,8 @@ public class User extends AbstractEntity implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    @Column(nullable = false)
-    private Boolean isActive = true;
+    @ColumnDefault("true")
+    private Boolean isActive;
 
     @Column(nullable = false)
     private String firstname;
@@ -106,7 +107,7 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return Boolean.TRUE.equals(isActive);
+        return this.getIsActive() == null || this.getIsActive();
     }
 
 }
