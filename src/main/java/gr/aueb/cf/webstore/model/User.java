@@ -7,7 +7,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.*;
 
 @Entity
@@ -31,6 +30,11 @@ public class User extends AbstractEntity implements UserDetails {
 
     @ColumnDefault("true")
     private Boolean isActive;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private Boolean emailVerified;
+
 
     @Column(nullable = false)
     private String firstname;
@@ -107,7 +111,7 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.getIsActive() == null || this.getIsActive();
+        return Boolean.TRUE.equals(this.getIsActive()) && Boolean.TRUE.equals(this.getEmailVerified());
     }
 
 }

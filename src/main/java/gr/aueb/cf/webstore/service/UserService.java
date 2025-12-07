@@ -27,34 +27,69 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final Mapper mapper;
+    private final IEmailVerificationService emailVerificationService;
+
 
     @Autowired
-    public UserService(UserRepository userRepository, Mapper mapper) {
+    public UserService(UserRepository userRepository, Mapper mapper, IEmailVerificationService emailVerificationService) {
+
         this.userRepository = userRepository;
         this.mapper = mapper;
+        this.emailVerificationService = emailVerificationService;
     }
+
 
     @Override
     @Transactional(rollbackOn = Exception.class)
     public UserReadOnlyDTO saveUser(UserInsertDTO userInsertDTO) throws AppObjectAlreadyExists {
 
-        if (userRepository.findByEmail(userInsertDTO.email()).isPresent()) {
-            throw new AppObjectAlreadyExists("Email", "User with email " + userInsertDTO.email() + " already exists");
+        var existingByEmail = userRepository.findByEmail(userInsertDTO.email());
+
+        if (existingByEmail.isPresent()) {
+
+            User existing = existingByEmail.get();
+
+            if (Boolean.TRUE.equals(existing.getEmailVerified())) {
+                throw new AppObjectAlreadyExists("Email","User with email " + userInsertDTO.email() + " already exists");
+            }
+
+            if (userInsertDTO.phoneNumber() != null && userRepository.findByPhoneNumber(userInsertDTO.phoneNumber())
+
+                            .filter(u -> !u.getId().equals(existing.getId()))
+                            .isPresent()) {
+                throw new AppObjectAlreadyExists("PhoneNumber","User with phone " + userInsertDTO.phoneNumber() + " already exists");
+            }
+
+            mapper.mapToUserEntity(userInsertDTO, existing);
+            existing.setIsActive(false);
+            existing.setEmailVerified(false);
+
+            User savedUser = userRepository.save(existing);
+
+            log.info("Unverified user updated and verification re-sent. email={}, phone={}", savedUser.getEmail(), savedUser.getPhoneNumber());
+
+            emailVerificationService.createAndSendToken(savedUser);
+
+            return mapper.mapToUserReadOnlyDTO(savedUser);
         }
 
         if (userInsertDTO.phoneNumber() != null && userRepository.findByPhoneNumber(userInsertDTO.phoneNumber()).isPresent()) {
-            throw new AppObjectAlreadyExists("PhoneNumber", "User with phone " + userInsertDTO.phoneNumber() + " already exists");
+            throw new AppObjectAlreadyExists("PhoneNumber","User with phone " + userInsertDTO.phoneNumber() + " already exists");
         }
 
         User user = mapper.mapToUserEntity(userInsertDTO);
+        user.setIsActive(false);
+        user.setEmailVerified(false);
 
         User savedUser = userRepository.save(user);
 
-        log.info("User created successfully. email={}, phone={}", user.getEmail(), user.getPhoneNumber());
+        log.info("New user created successfully. email={}, phone={}",savedUser.getEmail(), savedUser.getPhoneNumber());
+
+        emailVerificationService.createAndSendToken(savedUser);
 
         return mapper.mapToUserReadOnlyDTO(savedUser);
-
     }
+
 
     @Override
     @Transactional(rollbackOn = Exception.class)

@@ -3,14 +3,13 @@ package gr.aueb.cf.webstore.api;
 import gr.aueb.cf.webstore.authentication.AuthenticationService;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectInvalidArgumentException;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
-import gr.aueb.cf.webstore.dto.AuthenticationRequestDTO;
-import gr.aueb.cf.webstore.dto.AuthenticationResponseDTO;
-import gr.aueb.cf.webstore.dto.TwoFactorChallengeDTO;
-import gr.aueb.cf.webstore.dto.TwoFactorVerificationRequestDTO;
+import gr.aueb.cf.webstore.dto.*;
+import gr.aueb.cf.webstore.service.IEmailVerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthRestController {
 
     private final AuthenticationService authenticationService;
+    private final IEmailVerificationService emailVerificationService;
+
 
     @Operation(
             summary = "Start authentication",
@@ -59,6 +60,31 @@ public class AuthRestController {
 
         return new ResponseEntity<>(challenge, HttpStatus.OK);
     }
+
+    @Operation(
+            summary = "Verify email",
+            description = "Verifies a user's email using the token sent to their email.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Email verified successfully",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid or expired token",
+                            content = @Content
+                    )
+            }
+    )
+    @PostMapping("/verify-email")
+    public ResponseEntity<Void> verifyEmail(@RequestBody @Valid EmailVerificationRequestDTO request)
+            throws AppObjectInvalidArgumentException, AppObjectNotFoundException {
+
+        emailVerificationService.verify(request.token());
+        return ResponseEntity.ok().build();
+    }
+
 
     @Operation(
             summary = "Complete authentication",

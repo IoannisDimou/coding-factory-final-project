@@ -57,6 +57,20 @@ public class Mapper {
         return existingUser;
     }
 
+    public User mapToUserEntity(UserInsertDTO dto, User existingUser) {
+
+        existingUser.setIsActive(dto.isActive());
+        existingUser.setFirstname(dto.firstname());
+        existingUser.setLastname(dto.lastname());
+        existingUser.setEmail(dto.email());
+        existingUser.setPhoneNumber(dto.phoneNumber());
+        existingUser.setPassword(passwordEncoder.encode(dto.password()));
+        existingUser.setRole(dto.role());
+
+        return existingUser;
+    }
+
+
     public ProductReadOnlyDTO mapToProductReadOnlyDTO(Product product) {
 
         CategoryReadOnlyDTO categoryReadOnlyDTO = new CategoryReadOnlyDTO(
