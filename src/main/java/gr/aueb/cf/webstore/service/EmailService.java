@@ -49,8 +49,6 @@ public class EmailService implements IEmailService {
                 Please verify your email address by clicking the link below:
                 %s
 
-                If the link does not work, you can copy and paste this token into the verification form:
-                %s
 
                 This verification link/token expires in 30 minutes.
 

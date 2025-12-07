@@ -78,8 +78,7 @@ public class AuthRestController {
             }
     )
     @PostMapping("/verify-email")
-    public ResponseEntity<Void> verifyEmail(@RequestBody @Valid EmailVerificationRequestDTO request)
-            throws AppObjectInvalidArgumentException, AppObjectNotFoundException {
+    public ResponseEntity<Void> verifyEmail(@RequestBody @Valid EmailVerificationRequestDTO request) throws AppObjectInvalidArgumentException, AppObjectNotFoundException {
 
         emailVerificationService.verify(request.token());
         return ResponseEntity.ok().build();
