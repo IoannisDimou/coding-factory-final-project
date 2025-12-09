@@ -23,8 +23,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -45,7 +53,7 @@ public class ProductService implements IProductService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public ProductReadOnlyDTO saveProduct(ProductInsertDTO productInsertDTO) throws AppObjectAlreadyExists, AppObjectNotFoundException, AppObjectInvalidArgumentException {
+    public ProductReadOnlyDTO saveProduct(ProductInsertDTO productInsertDTO, MultipartFile imageFile) throws AppObjectAlreadyExists, AppObjectNotFoundException, IOException, AppObjectInvalidArgumentException {
 
         if (productRepository.findBySku(productInsertDTO.sku()).isPresent()) {
             throw new AppObjectAlreadyExists("Sku", "Product with SKU " + productInsertDTO.sku() + " already exists");
@@ -54,6 +62,12 @@ public class ProductService implements IProductService {
         Category category = categoryRepository.findById(productInsertDTO.categoryId()).orElseThrow(() -> new AppObjectNotFoundException("Category", "Category with id " + productInsertDTO.categoryId() + " not found"));
 
         Product product = mapper.mapToProductEntity(productInsertDTO, category);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imagePath = saveProductImage(imageFile);
+            product.setImage(imagePath);
+        }
+
         Product savedProduct = productRepository.save(product);
 
         log.info("Product created successfully. id={}, sku={}", savedProduct.getId(), savedProduct.getSku());
@@ -63,8 +77,8 @@ public class ProductService implements IProductService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public ProductReadOnlyDTO updateProduct(ProductUpdateDTO productUpdateDTO)
-            throws AppObjectAlreadyExists, AppObjectNotFoundException, AppObjectInvalidArgumentException {
+    public ProductReadOnlyDTO updateProduct(ProductUpdateDTO productUpdateDTO, MultipartFile imageFile)
+            throws AppObjectAlreadyExists, AppObjectNotFoundException, AppObjectInvalidArgumentException, IOException {
 
         Product existingProduct = productRepository.findById(productUpdateDTO.id())
                 .orElseThrow(() -> new AppObjectNotFoundException(
@@ -90,6 +104,15 @@ public class ProductService implements IProductService {
         if (productUpdateDTO.image() != null) existingProduct.setImage(productUpdateDTO.image());
 
         if (productUpdateDTO.sku() != null) existingProduct.setSku(productUpdateDTO.sku());
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+
+            if (existingProduct.getImage() != null) {
+                Files.deleteIfExists(Paths.get(existingProduct.getImage()));
+            }
+            String imagePath = saveProductImage(imageFile);
+            existingProduct.setImage(imagePath);
+        }
 
         Product updatedProduct = productRepository.save(existingProduct);
 
@@ -182,5 +205,35 @@ public class ProductService implements IProductService {
                 savedSpec.getValue(),
                 savedSpec.getProduct().getId()
         );
+    }
+
+    private String saveProductImage(MultipartFile imageFile) throws IOException {
+
+        if (imageFile == null || imageFile.isEmpty()) return null;
+
+        String originalFileName = imageFile.getOriginalFilename();
+        String savedName = UUID.randomUUID().toString() + getFileExtension(originalFileName);
+
+        Path uploadDir = Paths.get("uploads");
+        Files.createDirectories(uploadDir);
+
+        Path filePath = uploadDir.resolve(savedName);
+
+        try (InputStream inputStream = imageFile.getInputStream()) {
+            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        log.info("Image saved to {}", filePath.toAbsolutePath());
+
+        return "uploads/" + savedName;
+    }
+
+    private String getFileExtension(String filename) {
+
+        if (filename != null && filename.contains(".")) {
+            return filename.substring(filename.lastIndexOf("."));
+        }
+
+        return "";
     }
 }

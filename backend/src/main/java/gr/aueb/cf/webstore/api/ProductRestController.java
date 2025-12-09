@@ -15,11 +15,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -57,22 +61,23 @@ public class ProductRestController {
             }
     )
     @PostMapping(value = "/products")
-    public ResponseEntity<ProductReadOnlyDTO> saveProduct(@Valid @RequestBody ProductInsertDTO productInsertDTO, BindingResult bindingResult) throws
-            AppObjectAlreadyExists, AppObjectNotFoundException, AppObjectInvalidArgumentException, ValidationException {
+    public ResponseEntity<ProductReadOnlyDTO> saveProduct(@Valid @RequestPart("product") ProductInsertDTO productInsertDTO, BindingResult bindingResult,
+                                                          @Nullable @RequestPart(value = "image", required = false) MultipartFile image) throws
+            AppObjectAlreadyExists, AppObjectNotFoundException, AppObjectInvalidArgumentException, ValidationException, IOException {
 
             if (bindingResult.hasErrors()) {
                 throw new ValidationException(bindingResult);
             }
 
-            ProductReadOnlyDTO dto = productService.saveProduct(productInsertDTO);
+            ProductReadOnlyDTO dto = productService.saveProduct(productInsertDTO, image);
 
-        URI location = ServletUriComponentsBuilder
+            URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(dto.id())
                 .toUri();
 
-        return ResponseEntity
+            return ResponseEntity
                 .created(location)
                 .body(dto);
     }
@@ -231,8 +236,9 @@ public class ProductRestController {
             }
     )
     @PutMapping("/products/{id}")
-    public ResponseEntity<ProductReadOnlyDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductUpdateDTO productUpdateDTO, BindingResult bindingResult) throws
-            ValidationException, AppObjectNotFoundException, AppObjectAlreadyExists, AppObjectInvalidArgumentException {
+    public ResponseEntity<ProductReadOnlyDTO> updateProduct(@PathVariable Long id, @Valid @RequestPart(name = "product") ProductUpdateDTO productUpdateDTO, BindingResult bindingResult,
+                                                            @Nullable @RequestPart(value = "image", required = false) MultipartFile image) throws
+            ValidationException, AppObjectNotFoundException, AppObjectAlreadyExists, AppObjectInvalidArgumentException, IOException {
 
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
@@ -242,7 +248,7 @@ public class ProductRestController {
             throw new AppObjectInvalidArgumentException("Product", "Path id does not match body id");
         }
 
-        ProductReadOnlyDTO dto = productService.updateProduct(productUpdateDTO);
+        ProductReadOnlyDTO dto = productService.updateProduct(productUpdateDTO, image);
 
         return ResponseEntity.ok(dto);
 

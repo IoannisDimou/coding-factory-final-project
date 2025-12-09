@@ -6,16 +6,18 @@ import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
 import gr.aueb.cf.webstore.core.filters.Paginated;
 import gr.aueb.cf.webstore.core.filters.ProductFilters;
 import gr.aueb.cf.webstore.dto.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface IProductService {
 
-    ProductReadOnlyDTO saveProduct(ProductInsertDTO productInsertDTO)
-            throws AppObjectAlreadyExists, AppObjectNotFoundException, AppObjectInvalidArgumentException;
+    ProductReadOnlyDTO saveProduct(ProductInsertDTO productInsertDTO, MultipartFile imageFile)
+            throws AppObjectAlreadyExists, AppObjectNotFoundException, AppObjectInvalidArgumentException, IOException;
 
-    ProductReadOnlyDTO updateProduct(ProductUpdateDTO productUpdateDTO)
-            throws AppObjectAlreadyExists, AppObjectNotFoundException, AppObjectInvalidArgumentException;
+    ProductReadOnlyDTO updateProduct(ProductUpdateDTO productUpdateDTO, MultipartFile imageFile)
+            throws AppObjectAlreadyExists, AppObjectNotFoundException, AppObjectInvalidArgumentException, IOException;
 
     ProductReadOnlyDTO getOneProduct(Long id)
             throws AppObjectNotFoundException;
