@@ -2,6 +2,7 @@ package gr.aueb.cf.webstore.service;
 
 import gr.aueb.cf.webstore.core.enums.OrderStatus;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectInvalidArgumentException;
+import gr.aueb.cf.webstore.core.exceptions.AppObjectNotAuthorizedException;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
 import gr.aueb.cf.webstore.core.filters.OrderFilters;
 import gr.aueb.cf.webstore.core.filters.Paginated;
@@ -18,6 +19,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -115,14 +119,30 @@ public class OrderService implements  IOrderService {
 
     @Override
     @Transactional
-    public OrderReadOnlyDTO getOneOrder(Long id) throws AppObjectNotFoundException {
+    public OrderReadOnlyDTO getOneOrder(Long id) throws AppObjectNotFoundException, AppObjectNotAuthorizedException {
 
-        return orderRepository.findById(id)
-                .map(mapper::mapToOrderReadOnlyDTO)
-                .orElseThrow(() -> new AppObjectNotFoundException(
-                        "Order",
-                        "Order with id " + id + " not found"
-                ));
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppObjectNotFoundException("Order", "Order with id " + id + " not found"));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new AppObjectNotAuthorizedException("Order", "You are not allowed to access this order");
+        }
+
+        String username = auth.getName();
+
+        boolean isAdmin = auth.getAuthorities().stream()
+
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(a -> a.equals("ROLE_ADMIN"));
+
+        boolean isOwner = order.getUser() != null && username.equals(order.getUser().getEmail());
+
+        if (!isOwner && !isAdmin) throw new AppObjectNotAuthorizedException("Order", "You are not allowed to access this order");
+
+        return mapper.mapToOrderReadOnlyDTO(order);
+
     }
 
     @Override

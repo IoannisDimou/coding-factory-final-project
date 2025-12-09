@@ -1,6 +1,7 @@
 package gr.aueb.cf.webstore.api;
 
 import gr.aueb.cf.webstore.core.exceptions.AppObjectInvalidArgumentException;
+import gr.aueb.cf.webstore.core.exceptions.AppObjectNotAuthorizedException;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
 import gr.aueb.cf.webstore.core.exceptions.ValidationException;
 import gr.aueb.cf.webstore.core.filters.OrderFilters;
@@ -180,9 +181,10 @@ public class OrderRestController {
             }
     )
     @GetMapping("/orders/{id}")
-    public ResponseEntity<OrderReadOnlyDTO> getOrderById(@PathVariable Long id) throws AppObjectNotFoundException {
+    public ResponseEntity<OrderReadOnlyDTO> getOrderById(@PathVariable Long id) throws AppObjectNotFoundException, AppObjectNotAuthorizedException {
 
         return ResponseEntity.ok(orderService.getOneOrder(id));
+
     }
 
     @Operation(

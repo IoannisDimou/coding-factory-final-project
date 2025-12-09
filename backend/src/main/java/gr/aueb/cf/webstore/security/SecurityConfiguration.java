@@ -62,14 +62,15 @@ public class SecurityConfiguration {
 
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
 
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")
-
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,  "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/api/orders/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/orders").authenticated()
+                        .requestMatchers(HttpMethod.GET,  "/api/orders").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/orders/search").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,  "/api/orders/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT,  "/api/orders/**").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/api/payments/**").hasRole("ADMIN")
 
