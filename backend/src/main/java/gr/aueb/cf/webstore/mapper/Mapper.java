@@ -31,7 +31,8 @@ public class Mapper {
 
         User user = new User();
 
-        user.setIsActive(dto.isActive());
+        user.setIsActive(false);
+        user.setEmailVerified(false);
         user.setFirstname(dto.firstname());
         user.setLastname(dto.lastname());
         user.setEmail(dto.email());
@@ -59,7 +60,8 @@ public class Mapper {
 
     public User mapToUserEntity(UserInsertDTO dto, User existingUser) {
 
-        existingUser.setIsActive(dto.isActive());
+        existingUser.setIsActive(false);
+        existingUser.setEmailVerified(false);
         existingUser.setFirstname(dto.firstname());
         existingUser.setLastname(dto.lastname());
         existingUser.setEmail(dto.email());

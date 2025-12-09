@@ -52,7 +52,7 @@ public class AuthRestController {
                     )
             }
     )
-    @PostMapping("/authenticate")
+    @PostMapping("/login")
     public ResponseEntity<TwoFactorChallengeDTO> authenticate(@RequestBody AuthenticationRequestDTO authenticationRequestDTO) throws AppObjectNotFoundException,
             AppObjectInvalidArgumentException {
 

@@ -122,6 +122,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional
     public ProductReadOnlyDTO getOneProduct(Long id) throws AppObjectNotFoundException {
 
         return productRepository.findById(id)
@@ -130,6 +131,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional
     public Paginated<ProductReadOnlyDTO> getPaginatedProducts(int page, int size) {
 
         String defaultSort = "id";
@@ -142,6 +144,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional
     public Paginated<ProductReadOnlyDTO> getProductsFilteredPaginated(ProductFilters productFilters) {
 
         var filtered = productRepository.findAll(getSpecsFromFilters(productFilters), productFilters.getPageable());
@@ -161,6 +164,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional
     public List<ProductSpecReadOnlyDTO> getProductSpecs(Long productId)
             throws AppObjectNotFoundException {
 

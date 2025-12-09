@@ -4,6 +4,7 @@ import gr.aueb.cf.webstore.core.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,13 +29,11 @@ public class User extends AbstractEntity implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    @ColumnDefault("true")
+    @Column(nullable = false)
     private Boolean isActive;
 
     @Column(nullable = false)
-    @ColumnDefault("false")
     private Boolean emailVerified;
-
 
     @Column(nullable = false)
     private String firstname;
