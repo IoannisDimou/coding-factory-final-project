@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -230,7 +231,9 @@ public class Mapper {
                 itemsDTO,
                 paymentsDTO,
                 order.getTotalPrice(),
-                order.getStatus()
+                order.getStatus(),
+                order.getCreatedAt(),
+                order.getUpdatedAt()
         );
     }
 
