@@ -21,6 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
@@ -61,6 +64,8 @@ public class PaymentService implements IPaymentService {
 
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppObjectNotFoundException(
                 "Order", "Order with id " + orderId + " not found"));
+
+        userCanAccessOrder(order);
 
         if (order.getStatus() == OrderStatus.CANCELLED)
             throw new AppObjectInvalidArgumentException(
@@ -129,6 +134,9 @@ public class PaymentService implements IPaymentService {
         Payment payment = paymentRepository.findByPaymentToken(token).orElseThrow(() -> new AppObjectNotFoundException(
                         "Payment", "Payment with token " + token + " not found"));
 
+        Order order = payment.getOrder();
+        userCanAccessOrder(order);
+
         if (payment.getStatus() == PaymentStatus.COMPLETED) { throw new AppObjectInvalidArgumentException(
                     "Payment", "Payment is already completed");
         }
@@ -142,8 +150,6 @@ public class PaymentService implements IPaymentService {
         Payment updatedPayment = paymentRepository.save(payment);
 
         log.info("Payment with id={} confirmed successfully (token={}).", updatedPayment.getId(), token);
-
-        Order order = updatedPayment.getOrder();
 
         if (order != null) {
             emailService.sendOrderConfirmation(order);
@@ -189,6 +195,25 @@ public class PaymentService implements IPaymentService {
         Page<Payment> payments = paymentRepository.findAll(pageable);
 
         return Paginated.fromPage(payments.map(mapper::mapToPaymentReadOnlyDTO));
+    }
+
+    private void userCanAccessOrder(Order order) throws AppObjectInvalidArgumentException {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) throw new AppObjectInvalidArgumentException("Order", "You are not allowed to access this order");
+
+        String username = auth.getName();
+
+        boolean isAdmin = auth.getAuthorities().stream()
+
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(a -> a.equals("ROLE_ADMIN"));
+
+        boolean isOwner = order.getUser() != null && username.equals(order.getUser().getEmail());
+
+        if (!isOwner && !isAdmin) throw new AppObjectInvalidArgumentException("Order", "You are not allowed to access this order");
+
     }
 
 }
