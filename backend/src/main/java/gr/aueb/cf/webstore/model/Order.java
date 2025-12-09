@@ -37,14 +37,20 @@ public class Order extends AbstractEntity {
     @Column(nullable = false)
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
+    @Embedded
+    private Address shippingAddress;
+
     public BigDecimal calculateTotal() {
         return orderItems.stream()
                 .map(OrderItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    @Embedded
-    private Address shippingAddress;
+    public BigDecimal calculateTotalTax() {
+        return orderItems.stream()
+                .map(oi -> oi.getTax() != null ? oi.getTax() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
     @PrePersist
     public void initialStatus() {

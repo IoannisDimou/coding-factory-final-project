@@ -24,6 +24,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @Service
 @Slf4j
 public class OrderService implements  IOrderService {
@@ -32,6 +35,8 @@ public class OrderService implements  IOrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final Mapper mapper;
+    private static final BigDecimal TAX_RATE = new BigDecimal("0.24");
+
 
     @Autowired
     public OrderService(OrderRepository orderRepository, Mapper mapper, UserRepository userRepository, ProductRepository productRepository) {
@@ -83,6 +88,13 @@ public class OrderService implements  IOrderService {
             orderItem.setProduct(product);
             orderItem.setQuantity(itemDTO.quantity());
             orderItem.setPrice(product.getPrice());
+
+            BigDecimal quantity = BigDecimal.valueOf(itemDTO.quantity());
+            BigDecimal lineGross = product.getPrice().multiply(quantity);
+            BigDecimal lineNet = lineGross.divide(BigDecimal.ONE.add(TAX_RATE), 2, RoundingMode.HALF_UP);
+            BigDecimal lineTax = lineGross.subtract(lineNet);
+
+            orderItem.setTax(lineTax);
 
             order.addOrderItem(orderItem);
 

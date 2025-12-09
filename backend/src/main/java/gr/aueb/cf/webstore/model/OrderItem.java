@@ -31,10 +31,7 @@ public class OrderItem extends AbstractEntity{
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Column
-    private BigDecimal discount = BigDecimal.ZERO;
-
-    @Column
+    @Column(nullable = false)
     private BigDecimal tax = BigDecimal.ZERO;
 
     public void setOrder(Order order) {
@@ -45,14 +42,6 @@ public class OrderItem extends AbstractEntity{
     }
 
     public BigDecimal getSubtotal() {
-
-        BigDecimal quant = BigDecimal.valueOf(quantity);
-        BigDecimal total = price.multiply(quant);
-
-        if (discount != null) total = total.subtract(discount);
-
-        if (tax != null) total = total.add(tax);
-
-        return total;
+        return price.multiply(BigDecimal.valueOf(quantity));
     }
 }

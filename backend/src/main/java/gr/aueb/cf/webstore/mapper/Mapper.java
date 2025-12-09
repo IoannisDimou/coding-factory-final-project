@@ -204,7 +204,6 @@ public class Mapper {
                         item.getProduct().getName(),
                         item.getQuantity(),
                         item.getPrice(),
-                        item.getDiscount(),
                         item.getTax()
                 )).toList();
 
