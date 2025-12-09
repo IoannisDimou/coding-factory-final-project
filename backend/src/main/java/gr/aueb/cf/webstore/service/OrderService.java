@@ -181,4 +181,33 @@ public class OrderService implements  IOrderService {
 
         return Paginated.fromPage(page.map(mapper::mapToOrderReadOnlyDTO));
     }
+
+    @Override
+    @Transactional
+    public OrderReadOnlyDTO getOneOrderByCode(String orderCode) throws AppObjectNotFoundException, AppObjectNotAuthorizedException {
+
+        Order order = orderRepository.findByOrderCode(orderCode)
+                .orElseThrow(() -> new AppObjectNotFoundException("Order", "Order with code " + orderCode + " not found"));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new AppObjectNotAuthorizedException("Order", "You are not allowed to access this order");
+        }
+
+        String username = auth.getName();
+
+        boolean isAdmin = auth.getAuthorities().stream()
+
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(a -> a.equals("ROLE_ADMIN"));
+
+        boolean isOwner = order.getUser() != null && username.equals(order.getUser().getEmail());
+
+        if (!isOwner && !isAdmin) {
+            throw new AppObjectNotAuthorizedException("Order", "You are not allowed to access this order");
+        }
+
+        return mapper.mapToOrderReadOnlyDTO(order);
+    }
 }

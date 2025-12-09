@@ -230,4 +230,30 @@ public class OrderRestController {
 
         return ResponseEntity.ok(updated);
     }
+
+    @Operation(
+            summary = "Get a single order by code",
+            security = @SecurityRequirement(name = "Bearer Authentication"),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200", description = "Order returned",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = OrderReadOnlyDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404", description = "Order not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseMessageDTO.class)
+                            )
+                    )
+            }
+    )
+    @GetMapping("/orders/code/{orderCode}")
+    public ResponseEntity<OrderReadOnlyDTO> getOrderByCode(@PathVariable String orderCode) throws AppObjectNotFoundException, AppObjectNotAuthorizedException {
+
+        return ResponseEntity.ok(orderService.getOneOrderByCode(orderCode));
+    }
 }

@@ -224,6 +224,7 @@ public class Mapper {
 
         return new OrderReadOnlyDTO(
                 order.getId(),
+                order.getOrderCode(),
                 userReadOnlyDTO,
                 mapToAddressDTO(order.getShippingAddress()),
                 itemsDTO,

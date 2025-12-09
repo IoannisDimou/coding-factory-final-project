@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 public record OrderReadOnlyDTO(
         Long id,
+        String orderCode,
         UserReadOnlyDTO user,
         AddressDTO shippingAddress,
         List<OrderItemReadOnlyDTO> items,

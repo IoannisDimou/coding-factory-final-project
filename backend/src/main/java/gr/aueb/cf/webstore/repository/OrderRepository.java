@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
@@ -14,4 +15,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     List<Order> findByStatus(OrderStatus status);
 
     List<Order> findByTotalPriceBetween(BigDecimal min, BigDecimal max);
+
+    Optional<Order> findByOrderCode(String code);
 }

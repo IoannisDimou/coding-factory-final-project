@@ -21,4 +21,6 @@ public interface IOrderService {
 
     OrderReadOnlyDTO updateOrderStatus(OrderUpdateDTO orderUpdateDTO) throws AppObjectNotFoundException, AppObjectInvalidArgumentException;
 
+    OrderReadOnlyDTO getOneOrderByCode(String orderCode) throws AppObjectNotFoundException, AppObjectNotAuthorizedException;
+
 }

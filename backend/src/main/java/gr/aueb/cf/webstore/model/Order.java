@@ -6,6 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -19,6 +20,9 @@ public class Order extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "order_code", unique = true, nullable = false, updatable = false)
+    private String orderCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -54,7 +58,22 @@ public class Order extends AbstractEntity {
 
     @PrePersist
     public void initialStatus() {
-        if (status == null) status = OrderStatus.PENDING;
+
+        if (status == null) {
+            status = OrderStatus.PENDING;
+        }
+
+        if (orderCode == null) {
+            orderCode = generateOrderCode();
+        }
+    }
+
+    private String generateOrderCode() {
+        return  UUID.randomUUID()
+                    .toString()
+                    .replace("-", "")
+                    .substring(0, 10)
+                    .toUpperCase();
     }
 
     public void addPayment(Payment payment) {
