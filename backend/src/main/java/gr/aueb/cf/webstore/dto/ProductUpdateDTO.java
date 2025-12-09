@@ -22,7 +22,6 @@ public record ProductUpdateDTO(
 
         String description,
         String brand,
-        String image,
         String name,
         String sku
 ) {}

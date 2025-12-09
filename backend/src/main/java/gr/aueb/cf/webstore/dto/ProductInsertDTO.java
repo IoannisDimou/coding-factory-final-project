@@ -29,6 +29,6 @@ public record ProductInsertDTO(
     @NotNull(message = "isActive field is required")
     Boolean isActive,
 
-    String brand,
-    String image
+    String brand
+
 ) {}

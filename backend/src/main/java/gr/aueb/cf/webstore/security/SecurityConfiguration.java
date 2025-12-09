@@ -68,6 +68,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT,  "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/payments/**").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,  "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")

@@ -118,7 +118,6 @@ public class Mapper {
         product.setSku(dto.sku());
         product.setIsActive(dto.isActive());
         product.setBrand(dto.brand());
-        product.setImage(dto.image());
 
         return product;
 
@@ -136,7 +135,6 @@ public class Mapper {
         product.setSku(dto.sku());
         product.setIsActive(dto.isActive());
         product.setBrand(dto.brand());
-        product.setImage(dto.image());
         product.setCategory(category);
 
         return product;

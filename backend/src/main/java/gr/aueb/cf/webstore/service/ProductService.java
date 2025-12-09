@@ -101,7 +101,7 @@ public class ProductService implements IProductService {
 
         if (productUpdateDTO.brand() != null) existingProduct.setBrand(productUpdateDTO.brand());
 
-        if (productUpdateDTO.image() != null) existingProduct.setImage(productUpdateDTO.image());
+        //if (productUpdateDTO.image() != null) existingProduct.setImage(productUpdateDTO.image());
 
         if (productUpdateDTO.sku() != null) existingProduct.setSku(productUpdateDTO.sku());
 
