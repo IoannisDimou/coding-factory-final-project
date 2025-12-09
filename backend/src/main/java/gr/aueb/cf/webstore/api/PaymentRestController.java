@@ -26,7 +26,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/payments")
 @RequiredArgsConstructor
 public class PaymentRestController {
 
@@ -115,7 +115,7 @@ public class PaymentRestController {
                     )
             }
     )
-    @PostMapping("/confirm")
+    @PostMapping("/confirm-payment")
     public ResponseEntity<PaymentReadOnlyDTO> confirmPayment(@Valid @RequestBody PaymentConfirmationDTO paymentConfirmationDTO, BindingResult bindingResult)
             throws ValidationException, AppObjectInvalidArgumentException, AppObjectNotFoundException {
 
