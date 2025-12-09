@@ -114,6 +114,7 @@ public class OrderService implements  IOrderService {
     }
 
     @Override
+    @Transactional
     public OrderReadOnlyDTO getOneOrder(Long id) throws AppObjectNotFoundException {
 
         return orderRepository.findById(id)
@@ -125,6 +126,7 @@ public class OrderService implements  IOrderService {
     }
 
     @Override
+    @Transactional
     public Paginated<OrderReadOnlyDTO> getPaginatedOrders(int page, int size) {
 
         String defaultSort = "id";
@@ -138,6 +140,7 @@ public class OrderService implements  IOrderService {
     }
 
     @Override
+    @Transactional
     public Paginated<OrderReadOnlyDTO> getOrdersFilteredPaginated(OrderFilters orderFilters) {
 
         var page = orderRepository.findAll(orderFilters.getPageable());
