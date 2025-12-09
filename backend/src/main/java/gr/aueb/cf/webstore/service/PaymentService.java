@@ -34,6 +34,8 @@ public class PaymentService implements IPaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final Mapper mapper;
+    private final IEmailService emailService;
+
 
     private static final Set<String> ALLOWED_TEST_CARDS = Set.of(
             "6666000000000000",
@@ -42,10 +44,11 @@ public class PaymentService implements IPaymentService {
     );
 
     @Autowired
-    public PaymentService(PaymentRepository paymentRepository, OrderRepository orderRepository, Mapper mapper) {
+    public PaymentService(PaymentRepository paymentRepository, OrderRepository orderRepository, Mapper mapper, IEmailService emailService) {
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
         this.mapper = mapper;
+        this.emailService = emailService;
     }
 
     @Override
@@ -139,6 +142,12 @@ public class PaymentService implements IPaymentService {
         Payment updatedPayment = paymentRepository.save(payment);
 
         log.info("Payment with id={} confirmed successfully (token={}).", updatedPayment.getId(), token);
+
+        Order order = updatedPayment.getOrder();
+
+        if (order != null) {
+            emailService.sendOrderConfirmation(order);
+        }
 
         return mapper.mapToPaymentReadOnlyDTO(updatedPayment);
     }

@@ -166,6 +166,7 @@ public class Mapper {
         return new PaymentReadOnlyDTO(
                 payment.getId(),
                 payment.getTransactionId(),
+                payment.getPaymentToken(),
                 payment.getAmount(),
                 payment.getMethod(),
                 payment.getStatus(),
@@ -213,6 +214,7 @@ public class Mapper {
                 .map(payment -> new PaymentReadOnlyDTO(
                         payment.getId(),
                         payment.getTransactionId(),
+                        payment.getPaymentToken(),
                         payment.getAmount(),
                         payment.getMethod(),
                         payment.getStatus(),

@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 public record PaymentReadOnlyDTO(
         Long id,
         String transactionId,
+        String paymentToken,
         BigDecimal amount,
         PaymentMethod method,
         PaymentStatus status,
