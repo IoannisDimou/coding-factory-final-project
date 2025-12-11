@@ -11,7 +11,6 @@ export default function TwoFactorPage() {
     const {
         verifyTwoFactor,
         isTwoFactorPending,
-        twoFactorDelivery,
         twoFactorMessage,
         isAuthenticated,
     } = useAuth();
@@ -25,7 +24,7 @@ export default function TwoFactorPage() {
 
     if (!isTwoFactorPending) {
         if (isAuthenticated) {
-            return <Navigate to="/products" replace/>;
+            return <Navigate to="/" replace/>;
         }
         return <Navigate to="/login" replace/>;
     }
@@ -34,7 +33,7 @@ export default function TwoFactorPage() {
         try {
             await verifyTwoFactor(code);
             toast.success("Login completed");
-            navigate("/products");
+            navigate("/");
         } catch (err) {
             toast.error(
                 err instanceof Error ? err.message : "Verification failed"

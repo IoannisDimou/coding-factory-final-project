@@ -7,10 +7,17 @@ import {toast} from "sonner";
 import {useNavigate} from "react-router";
 import {useAuth} from "@/hooks/useAuth.js";
 import {loginSchema} from "@/schemas/login.js";
+import {useEffect} from "react";
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const {loginUser} = useAuth();
+    const {loginUser, isAuthenticated} = useAuth();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/");
+        }
+    }, [isAuthenticated, navigate])
 
     const {
         register,
@@ -22,12 +29,7 @@ export default function LoginPage() {
 
     const onSubmit = async (data) => {
         try {
-            const challenge = await loginUser(data);
-            toast.success(
-                challenge.message ||
-                `Verification code sent via ${challenge.deliveryMethod}`
-            );
-
+            await loginUser(data);
             navigate("/2fa");
 
         } catch (err) {
@@ -67,7 +69,7 @@ export default function LoginPage() {
                     )}
                 </div>
                 <Button disabled={isSubmitting} className="w-full">
-                    {isSubmitting ? "Sending code..." : "Login"}
+                    Login
                 </Button>
             </form>
         </>

@@ -7,9 +7,19 @@ import {useNavigate} from "react-router";
 import {Label} from "@/components/ui/label.jsx";
 import {Input} from "@/components/ui/input.jsx";
 import {Button} from "@/components/ui/button.jsx";
+import {useAuth} from "@/hooks/useAuth.js";
+import {useEffect} from "react";
 
 export default function SignUpPage() {
+
     const navigate = useNavigate();
+    const {isAuthenticated} = useAuth();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/");
+        }
+    }, [isAuthenticated, navigate]);
 
     const {
         register,

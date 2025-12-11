@@ -1,7 +1,27 @@
 import {useEffect, useState} from "react";
-import {deleteCookie, getCookie, setCookie} from "@/utils/cookies.js";
 import {AuthContext} from "@/context/AuthContext.js";
+import {jwtDecode} from "jwt-decode";
 import {login, verifyTwoFactor} from "@/services/api.login.js";
+
+function getValidToken() {
+    try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            return null;
+        }
+        const decoded = jwtDecode(token);
+        const expire = decoded.exp;
+
+        if (expire && expire * 1000 < Date.now()) {
+            localStorage.removeItem("access_token");
+            return null;
+        }
+        return token;
+    } catch {
+        localStorage.removeItem("access_token");
+        return null;
+    }
+}
 
 export const AuthProvider = ({children}) => {
 
@@ -14,9 +34,10 @@ export const AuthProvider = ({children}) => {
     const [isTwoFactorPending, setIsTwoFactorPending] = useState(false);
 
     useEffect(() => {
-        const token = getCookie("access_token");
-        setAccessToken(token ?? null);
+        const token = getValidToken();
+        setAccessToken(token);
         setLoading(false);
+
     }, []);
 
     const loginUser = async ({email, password}) => {
@@ -39,13 +60,7 @@ export const AuthProvider = ({children}) => {
 
         const res = await verifyTwoFactor({twoFactorToken, code});
 
-        setCookie("access_token", res.token, {
-            expires: 1,
-            sameSite: "Lax",
-            secure: false, // true (HTTPS)
-            path: "/",
-        });
-
+        localStorage.setItem("access_token", res.token);
         setAccessToken(res.token);
 
         setIsTwoFactorPending(false);
@@ -57,7 +72,8 @@ export const AuthProvider = ({children}) => {
     };
 
     const logoutUser = () => {
-        deleteCookie("access_token");
+        localStorage.removeItem("access_token");
+
         setAccessToken(null);
         setIsTwoFactorPending(false);
         setTwoFactorToken(null);
