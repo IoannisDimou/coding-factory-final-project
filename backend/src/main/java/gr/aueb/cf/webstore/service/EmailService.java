@@ -116,4 +116,27 @@ public class EmailService implements IEmailService {
 
         log.info("Order confirmation email sent for order id={}, code={}, to={}", order.getId(), order.getOrderCode(), to);
     }
+
+    @Override
+    public void sendPasswordResetEmail(String to, String resetLink) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(FROM_ADDRESS);
+        message.setTo(to);
+        message.setSubject("Reset your password");
+        message.setText("""
+            You requested a password reset.
+
+            Click the link below to set a new password:
+            %s
+
+            This link expires in 10 minutes.
+
+            If you did not request this, you can safely ignore this email.
+            """.formatted(resetLink)
+        );
+
+        mailSender.send(message);
+        log.info("Password reset email sent to={}", to);
+    }
 }

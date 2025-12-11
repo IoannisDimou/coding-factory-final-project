@@ -5,6 +5,7 @@ import gr.aueb.cf.webstore.core.exceptions.AppObjectInvalidArgumentException;
 import gr.aueb.cf.webstore.core.exceptions.AppObjectNotFoundException;
 import gr.aueb.cf.webstore.dto.*;
 import gr.aueb.cf.webstore.service.IEmailVerificationService;
+import gr.aueb.cf.webstore.service.IPasswordResetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,6 +26,7 @@ public class AuthRestController {
 
     private final AuthenticationService authenticationService;
     private final IEmailVerificationService emailVerificationService;
+    private final IPasswordResetService passwordResetService;
 
 
     @Operation(
@@ -111,6 +113,63 @@ public class AuthRestController {
         AuthenticationResponseDTO responseDTO = authenticationService.completeAuthentication(requestDTO);
 
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Request password reset",
+            description = "Sends a password reset email if the account exists.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "If this email exists, a reset link has been sent",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseMessageDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad request – invalid email",
+                            content = @Content
+                    )
+            }
+    )
+    @PostMapping("/password-reset/request")
+    public ResponseEntity<ResponseMessageDTO> requestPasswordReset(@Valid @RequestBody PasswordResetRequestDTO dto) throws AppObjectNotFoundException {
+
+        passwordResetService.createToken(dto.email());
+        return ResponseEntity.ok(new ResponseMessageDTO("If this email exists, a reset link has been sent"));
+    }
+
+    @Operation(
+            summary = "Confirm password reset",
+            description = "Resets the user's password using the password reset token.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Password reset successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseMessageDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid or expired token, or invalid password",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "User not found",
+                            content = @Content
+                    )
+            }
+    )
+    @PostMapping("/password-reset/confirm")
+    public ResponseEntity<ResponseMessageDTO> confirmPasswordReset(@Valid @RequestBody PasswordResetConfirmDTO dto) throws AppObjectInvalidArgumentException, AppObjectNotFoundException {
+
+        passwordResetService.resetPassword(dto.token(), dto.newPassword());
+        return ResponseEntity.ok(new ResponseMessageDTO("Password reset successfully"));
     }
 
 }

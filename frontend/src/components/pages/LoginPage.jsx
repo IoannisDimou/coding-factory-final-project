@@ -1,5 +1,6 @@
 import {Label} from "@/components/ui/label.jsx";
 import {Input} from "@/components/ui/input.jsx";
+import {Link} from "react-router";
 import {Button} from "@/components/ui/button.jsx";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
@@ -68,9 +69,22 @@ export default function LoginPage() {
                         </div>
                     )}
                 </div>
+
+                <div className="flex justify-end">
+                    <Link to="/forgot-password"
+                          className="text-xs text-ws-dark hover:underline">Forgotten
+                        password?</Link>
+                </div>
                 <Button disabled={isSubmitting} className="w-full">
                     Login
                 </Button>
+
+                <p className="text-center text-sm text-ws-gray">
+                    Don't have an account? <Link to="/signup"
+                                                 className="text-ws-dark font-medium hover:underline">Sign
+                    up
+                    instead</Link>
+                </p>
             </form>
         </>
     )
