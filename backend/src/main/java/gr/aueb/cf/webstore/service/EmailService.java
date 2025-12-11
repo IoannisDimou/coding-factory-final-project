@@ -1,11 +1,12 @@
 package gr.aueb.cf.webstore.service;
-
 import gr.aueb.cf.webstore.model.Order;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -43,25 +44,36 @@ public class EmailService implements IEmailService {
 
     @Override
     public void sendEmailVerification(String to, String verificationLink, String token) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(FROM_ADDRESS);
-        message.setTo(to);
-        message.setSubject("Verify your email address");
-        message.setText("""
+            helper.setFrom(FROM_ADDRESS);
+            helper.setTo(to);
+            helper.setSubject("Verify your email");
 
-                Please verify your email address by clicking the link below:
-                %s
+            String html = """
+            <div>
+            <p>Hi,</p>
+            <p>Thanks for creating an account at <strong>Arctic Builds</strong>.</p>
+            <p>Click the button below to verify your email address:</p>
+            <a href="%s"
+               style="display:inline-block;padding:10px 16px;
+                      background:#111827;color:#ffffff;text-decoration:none;
+                      border-radius:6px;font-weight:600;">
+              Verify email
+            </a>
+            <p>This verification link expires in 30 minutes. If you did not register for an account,
+               you can safely ignore this email. </p>
+            </div>
+            """.formatted(verificationLink);
 
-
-                This verification link/token expires in 30 minutes.
-
-                If you did not register for an account, you can safely ignore this email.
-                """.formatted(verificationLink, token)
-        );
-
-        mailSender.send(message);
-        log.info("Email verification email sent to {}", to);
+            helper.setText(html, true);
+            mailSender.send(mimeMessage);
+            log.info("Email verification email sent to {}", to);
+        } catch (MessagingException e) {
+            log.error("Failed to send verification email to {}", to, e);
+        }
     }
 
     @Override
@@ -104,5 +116,4 @@ public class EmailService implements IEmailService {
 
         log.info("Order confirmation email sent for order id={}, code={}, to={}", order.getId(), order.getOrderCode(), to);
     }
-
 }
