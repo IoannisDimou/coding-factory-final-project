@@ -1,4 +1,9 @@
-import {useEffect} from "react"
+import {useEffect, useState} from "react"
+import {Link} from "react-router";
+import getProducts from "@/services/api.products.js";
+import {Button} from "@/components/ui/button.jsx";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const categories = [
     {name: "CPUs"},
@@ -10,10 +15,56 @@ const priceRanges = [
     {label: "AMD"}
 ]
 
+function getImageUrl(image) {
+    if (!image) return null;
+    if (image.startsWith("http")) return image;
+
+    if (image.startsWith("/")) {
+        return `${API_BASE_URL}${image}`;
+    }
+    return `${API_BASE_URL}/${image}`;
+}
+
 const HomePage = () => {
     useEffect(() => {
         document.title = "Arctic Builds"
     }, [])
+
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        let cancelled = false;
+
+
+        async function fetchProducts() {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await getProducts();
+                if (!cancelled) {
+                    setProducts(Array.isArray(data) ? data : []);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setError(
+                        err instanceof Error ? err.message : "Failed to fetch products"
+                    );
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        fetchProducts();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     return (
         <main
@@ -87,12 +138,82 @@ const HomePage = () => {
             <section className="flex-1" aria-label="Products">
                 <header className="mb-6 mt-1 md:mt-[6px]">
                     <h1 className="text-2xl font-semibold">PC Upgrades</h1>
-                    <p className="text-sm text-ws-gray mt-1"></p>
                 </header>
+
+                {loading && (
+                    <p className="text-sm text-ws-gray">Loading products...</p>
+                )}
+
+                {error && !loading && (
+                    <p className="text-sm text-destructive">{error}</p>
+                )}
+
+                {!loading && !error && products.length === 0 && (
+                    <p className="text-sm text-ws-gray">No products found.</p>
+                )}
+
+                {!loading && !error && products.length > 0 && (
+                    <div
+                        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {products.map((product) => (
+                            <article
+                                key={product.id}
+                                className="flex flex-col rounded-lg border border-border bg-card hover:shadow-md transition-shadow"
+                            >
+                                <div
+                                    className="aspect-[4/3] w-full bg-secondary flex items-center justify-center overflow-hidden rounded-t-lg">
+                                    {product.image ? (
+                                        <img
+                                            src={getImageUrl(product.image)}
+                                            alt={product.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-xs text-ws-gray">No image</span>
+                                    )}
+                                </div>
+
+                                <div
+                                    className="flex flex-col gap-1 px-4 py-3 flex-1">
+                                    <Link
+                                        to={`/products/${product.id}`}
+                                        className="text-sm font-semibold text-ws-dark hover:text-ws-gray line-clamp-2"
+                                    >
+                                        {product.name}
+                                    </Link>
+
+                                    {product.brand && (
+                                        <p className="text-xs text-ws-gray">{product.brand}</p>
+                                    )}
+
+                                    <p className="text-xs text-ws-gray line-clamp-2">
+                                        {product.description}
+                                    </p>
+
+                                    <div
+                                        className="flex items-center justify-between px-4 pb-3 pt-1">
+                    <span className="text-base font-semibold">
+                      {typeof product.price === "number"
+                          ? `${product.price.toFixed(2)} €`
+                          : product.price}
+                    </span>
+                                        <Button asChild size="sm"
+                                                className="text-xs px-3 py-1">
+                                            <Link
+                                                to={`/products/${product.id}`}>View
+                                                details</Link>
+                                        </Button>
+                                    </div>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                )}
             </section>
         </main>
-    )
-}
+    );
+};
+
 
 export default HomePage
 

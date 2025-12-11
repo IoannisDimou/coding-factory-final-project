@@ -7,6 +7,7 @@ import {Toaster} from "sonner";
 import TwoFactorPage from "@/components/pages/TwoFactorPage.jsx";
 import SignupPage from "@/components/pages/SignupPage.jsx";
 import VerifyEmailPage from "@/components/pages/VerifyEmailPage.jsx";
+import ProductPage from "@/components/pages/ProductPage.jsx";
 
 //import ProtectedRoute from "@/components/ProtectedRoute.jsx";
 
@@ -24,6 +25,8 @@ function App() {
                             <Route path="/signup" element={<SignupPage/>}/>
                             <Route path="/verify-email"
                                    element={<VerifyEmailPage/>}/>
+                            <Route path="/products/:productId"
+                                   element={<ProductPage/>}/>
                         </Route>
                     </Routes>
                 </BrowserRouter>

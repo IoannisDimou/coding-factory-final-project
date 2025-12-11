@@ -101,14 +101,12 @@ public class ProductService implements IProductService {
 
         if (productUpdateDTO.brand() != null) existingProduct.setBrand(productUpdateDTO.brand());
 
-        //if (productUpdateDTO.image() != null) existingProduct.setImage(productUpdateDTO.image());
-
         if (productUpdateDTO.sku() != null) existingProduct.setSku(productUpdateDTO.sku());
 
         if (imageFile != null && !imageFile.isEmpty()) {
 
             if (existingProduct.getImage() != null) {
-                Files.deleteIfExists(Paths.get(existingProduct.getImage()));
+                deleteImageFile(existingProduct.getImage());
             }
             String imagePath = saveProductImage(imageFile);
             existingProduct.setImage(imagePath);
@@ -229,7 +227,7 @@ public class ProductService implements IProductService {
 
         log.info("Image saved to {}", filePath.toAbsolutePath());
 
-        return "uploads/" + savedName;
+        return "/uploads/" + savedName;
     }
 
     private String getFileExtension(String filename) {
@@ -239,5 +237,19 @@ public class ProductService implements IProductService {
         }
 
         return "";
+    }
+
+    private void deleteImageFile(String imagePath) {
+        try {
+            String fileName = Paths.get(imagePath).getFileName().toString();
+            Path uploadDir = Paths.get("uploads");
+            Path filePath = uploadDir.resolve(fileName);
+
+            Files.deleteIfExists(filePath);
+
+            log.info("Deleted old image file {}", filePath.toAbsolutePath());
+        } catch (IOException e) {
+            log.warn("Failed to delete old image {}", imagePath, e);
+        }
     }
 }

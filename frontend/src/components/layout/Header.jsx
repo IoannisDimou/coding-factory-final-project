@@ -43,7 +43,6 @@ const Header = () => {
 
                     <form role="search"
                           className="order-3 w-full md:order-2 md:flex-1 md:w-auto mt-1">
-
                         <div
                             className="hidden md:flex items-center w-full rounded-full bg-secondary px-5 py-2.5">
                             <MagnifyingGlassIcon
@@ -66,10 +65,8 @@ const Header = () => {
 
                     <nav
                         className="order-2 ml-auto flex items-center gap-4 md:order-3 mt-1"
-                        aria-label="Primary navigation"
-                    >
+                        aria-label="Primary navigation">
                         <div className="flex items-center gap-4 md:gap-5">
-
                             {!isAuthenticated && links.map((item) => (
                                 <Button
                                     key={item.path}
