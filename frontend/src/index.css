@@ -31,6 +31,9 @@
     --border: #d1d5dc;
     --input: #e1e5ee;
     --ring: var(--color-ws-gray);
+
+    --destructive: #BD1900;
+    --destructive-foreground: #DB543B;
 }
 
 @theme inline {
@@ -54,6 +57,10 @@
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
+
+
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
 }
 
 @layer base {

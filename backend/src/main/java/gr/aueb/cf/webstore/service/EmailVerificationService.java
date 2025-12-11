@@ -27,8 +27,8 @@ public class EmailVerificationService implements IEmailVerificationService {
     private final UserRepository userRepository;
     private final IEmailService emailService;
 
-//    @Value("${app.frontend.base-url:http://localhost:5173}")
-//    private String frontendBaseUrl;
+    @Value("${app.frontend.base-url:http://localhost:5173}")
+    private String frontendBaseUrl;
 
     @Override
     public void createAndSendToken(User user) {
@@ -40,9 +40,7 @@ public class EmailVerificationService implements IEmailVerificationService {
                 .opsForValue()
                 .set(key, user.getEmail(), Duration.ofMinutes(EXPIRATION_MINUTES));
 
-        //String verificationLink = frontendBaseUrl + "/verify-email?token=" + token;
-        String verificationLink = "http://localhost:8080/api/auth/verify-email?token=" + token;
-
+        String verificationLink = frontendBaseUrl + "/verify-email?token=" + token;
 
         emailService.sendEmailVerification(user.getEmail(), verificationLink, token);
 
