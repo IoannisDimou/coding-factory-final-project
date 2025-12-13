@@ -40,7 +40,7 @@ public class Product extends AbstractEntity {
     @Column
     private Boolean isActive;
 
-    @Column(length = 10, nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String sku;
 
     @Column

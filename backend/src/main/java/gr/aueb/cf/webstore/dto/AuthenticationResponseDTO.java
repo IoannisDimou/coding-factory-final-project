@@ -6,5 +6,6 @@ public record AuthenticationResponseDTO(
         String firstname,
         String lastname,
         Role role,
-        String token
+        String token,
+        String uuid
 ) {}
