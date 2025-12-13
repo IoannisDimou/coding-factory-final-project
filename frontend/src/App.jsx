@@ -5,7 +5,7 @@ import LoginPage from "@/components/pages/LoginPage.jsx";
 import { AuthProvider } from "@/context/AuthProvider.jsx";
 import { Toaster } from "sonner";
 import TwoFactorPage from "@/components/pages/TwoFactorPage.jsx";
-import SignupPage from "@/components/pages/SignupPage.jsx";
+import SignUpPage from "@/components/pages/SignUpPage.jsx";
 import VerifyEmailPage from "@/components/pages/VerifyEmailPage.jsx";
 import ProductPage from "@/components/pages/ProductPage.jsx";
 import ForgotPasswordPage from "@/components/pages/ForgotPasswordPage.jsx";
@@ -28,7 +28,7 @@ function App() {
                 <Route index element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/2fa" element={<TwoFactorPage />} />
-                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/signup" element={<SignUpPage />} />
                 <Route path="/verify-email" element={<VerifyEmailPage />} />
                 <Route path="/products/:productId" element={<ProductPage />} />
                 <Route

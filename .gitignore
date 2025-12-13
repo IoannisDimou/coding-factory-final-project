@@ -1,0 +1,12 @@
+.env
+.env.* 
+!.env.docker.example
+!frontend/.env.example
+!backend/.env.example
+backend/.env
+backend/.env.*
+backend/**/.env
+backend/**/.env.*
+.idea/
+.vscode/
+.DS_Store
