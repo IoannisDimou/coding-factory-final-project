@@ -19,7 +19,6 @@ const UserPanel = () => {
   const [error, setError] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
   const [editValues, setEditValues] = useState({});
-  const [addingNew, setAddingNew] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,14 +88,6 @@ const UserPanel = () => {
     } catch (err) {
       alert(err.message || "Failed to update user");
     }
-  };
-
-  const handleAddNew = () => {
-    setAddingNew(true);
-    setEditValues({
-      name: "",
-      isActive: true,
-    });
   };
 
   const handleCancel = () => {
