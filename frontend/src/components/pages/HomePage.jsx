@@ -172,8 +172,7 @@ const HomePage = () => {
               >
                 <input
                   type="checkbox"
-                  className="h-4 w-4 rounded border border-border
-                                       "
+                  className="h-4 w-4 rounded border border-border"
                   checked={brands.includes(range.label)}
                   onChange={() => toggleBrand(range.label)}
                 />

@@ -1,5 +1,11 @@
 const API_PRODUCTS_URL = import.meta.env.VITE_API_PRODUCTS_URL;
 
+function getAuthHeaders() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return {};
+  return { Authorization: `Bearer ${token}` };
+}
+
 export default async function getProducts() {
   const res = await fetch(`${API_PRODUCTS_URL}/products`);
   if (!res.ok) {
@@ -40,4 +46,38 @@ export async function searchProducts(filters) {
   const body = await res.json();
 
   return Array.isArray(body.data) ? body.data : [];
+}
+
+export async function createProduct(formData) {
+  const res = await fetch(`${API_PRODUCTS_URL}/products`, {
+    method: "POST",
+    headers: {
+      ...getAuthHeaders(),
+    },
+    body: formData,
+  });
+
+  const text = await res.text();
+  if (!res.ok) {
+    console.error("Create product failed:", text);
+    throw new Error("Failed to create product");
+  }
+  return text ? JSON.parse(text) : null;
+}
+
+export async function updateProduct(id, formData) {
+  const res = await fetch(`${API_PRODUCTS_URL}/products/${id}`, {
+    method: "PUT",
+    headers: {
+      ...getAuthHeaders(),
+    },
+    body: formData,
+  });
+
+  const text = await res.text();
+  if (!res.ok) {
+    console.error("Update product failed:", text);
+    throw new Error("Failed to update product");
+  }
+  return text ? JSON.parse(text) : null;
 }

@@ -13,8 +13,9 @@ import ResetPasswordPage from "@/components/pages/ResetPasswordPage.jsx";
 import CartPage from "@/components/pages/CartPage.jsx";
 import { CartProvider } from "@/context/CartContext.jsx";
 import OrderLookupPage from "@/components/pages/OrderLookupPage.jsx";
-
-//import ProtectedRoute from "@/components/ProtectedRoute.jsx";
+import AdminPanelPage from "@/components/pages/AdminPanelPage.jsx";
+import ProductForm from "@/components/pages/ProductFormPage.jsx";
+import ProtectedRoute from "@/components/ProtectedRoute.jsx";
 
 function App() {
   return (
@@ -37,6 +38,15 @@ function App() {
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/orders" element={<OrderLookupPage />} />
+
+                <Route element={<ProtectedRoute requiredRole="ADMIN" />}>
+                  <Route path="/admin" element={<AdminPanelPage />} />
+                  <Route path="/admin/products/new" element={<ProductForm />} />
+                  <Route
+                    path="/admin/products/:productId/edit"
+                    element={<ProductForm />}
+                  />
+                </Route>
               </Route>
             </Routes>
           </BrowserRouter>
