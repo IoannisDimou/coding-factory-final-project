@@ -51,11 +51,6 @@ const ProductPanel = () => {
     };
   }, []);
 
-  const handleDelete = (id) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-    console.log("Deleted product:", id);
-  };
-
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
