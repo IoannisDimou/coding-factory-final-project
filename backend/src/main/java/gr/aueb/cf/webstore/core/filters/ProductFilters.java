@@ -34,4 +34,7 @@ public class ProductFilters extends GenericFilters {
     @Nullable
     private String specValue;
 
+    @Nullable
+    private Boolean isActive;
+
 }

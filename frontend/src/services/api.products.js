@@ -26,14 +26,16 @@ export async function getProduct(id) {
   return res.json();
 }
 
-export async function searchProducts(filters) {
-  const payload = {
-    page: 0,
-    pageSize: 10,
-    sortBy: "id",
-    sortDirection: "ASC",
-    ...filters,
-  };
+export async function searchProducts(filters = {}) {
+  const {
+    page = 0,
+    pageSize = 12,
+    sortBy = "id",
+    sortDirection = "ASC",
+    ...rest
+  } = filters;
+
+  const payload = { page, pageSize, sortBy, sortDirection, ...rest };
 
   const res = await fetch(`${API_PRODUCTS_URL}/products/search`, {
     method: "POST",
@@ -43,9 +45,7 @@ export async function searchProducts(filters) {
 
   if (!res.ok) throw new Error("Failed to search products");
 
-  const body = await res.json();
-
-  return Array.isArray(body.data) ? body.data : [];
+  return res.json();
 }
 
 export async function createProduct(formData) {
@@ -80,4 +80,13 @@ export async function updateProduct(id, formData) {
     throw new Error("Failed to update product");
   }
   return text ? JSON.parse(text) : null;
+}
+
+export async function getProductsPage({ page = 0, size = 12 } = {}) {
+  const res = await fetch(
+    `${API_PRODUCTS_URL}/products?page=${page}&size=${size}`,
+  );
+  if (!res.ok) throw new Error("Failed to fetch products (page)");
+
+  return res.json();
 }

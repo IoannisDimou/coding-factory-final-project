@@ -7,15 +7,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button.jsx";
-import { Trash2, Pencil, Plus } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-import getProducts from "@/services/api.products.js";
+import { getProductsPage } from "@/services/api.products.js";
+
+const PAGE_SIZE = 12;
 
 const ProductPanel = () => {
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const navigate = useNavigate();
   const location = useLocation();
   const returnTo = location.pathname + location.search;
@@ -27,9 +33,19 @@ const ProductPanel = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await getProducts();
+
+        const pageRes = await getProductsPage({ page, size: PAGE_SIZE });
+
+        const items = Array.isArray(pageRes?.data) ? pageRes.data : [];
+        const tp =
+          typeof pageRes?.totalPages === "number" ? pageRes.totalPages : 0;
+
         if (!cancelled) {
-          setProducts(Array.isArray(data) ? data : []);
+          setProducts(items);
+          setTotalPages(tp);
+
+          // if you end up on a dead page, snap back
+          if (tp > 0 && page >= tp) setPage(tp - 1);
         }
       } catch (err) {
         if (!cancelled) {
@@ -38,18 +54,17 @@ const ProductPanel = () => {
           );
         }
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     }
 
     fetchProducts();
-
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [page]);
+
+  const hasNext = page + 1 < totalPages;
 
   return (
     <div className="p-8">
@@ -64,8 +79,8 @@ const ProductPanel = () => {
           Add Product
         </Button>
       </div>
-      {loading && <p className="text-sm text-ws-gray">Loading products...</p>}
 
+      {loading && <p className="text-sm text-ws-gray">Loading products...</p>}
       {error && !loading && <p className="text-sm text-destructive">{error}</p>}
 
       {!loading && !error && products.length === 0 && (
@@ -91,7 +106,7 @@ const ProductPanel = () => {
               <TableRow key={product.id}>
                 <TableCell>{product.id}</TableCell>
                 <TableCell>{product.name}</TableCell>
-                <TableCell>${product.price.toFixed(2)}</TableCell>
+                <TableCell>${Number(product.price).toFixed(2)}</TableCell>
                 <TableCell>{product.stock}</TableCell>
                 <TableCell>{product.brand}</TableCell>
                 <TableCell>
@@ -121,6 +136,32 @@ const ProductPanel = () => {
             ))}
           </TableBody>
         </Table>
+      )}
+
+      {!loading && !error && totalPages > 1 && (
+        <div className="mt-8 flex items-center justify-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page === 0}
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+          >
+            Prev
+          </Button>
+
+          <span className="text-sm text-ws-gray">
+            Page {page + 1} / {totalPages}
+          </span>
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!hasNext}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next
+          </Button>
+        </div>
       )}
     </div>
   );

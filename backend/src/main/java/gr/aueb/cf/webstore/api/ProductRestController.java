@@ -179,6 +179,10 @@ public class ProductRestController {
 
         if (filters == null) filters = ProductFilters.builder().build();
 
+        if (filters.getIsActive() == null) {
+            filters.setIsActive(true);
+        }
+
         Paginated<ProductReadOnlyDTO> paginated = productService.getProductsFilteredPaginated(filters);
 
         return ResponseEntity.ok(paginated);

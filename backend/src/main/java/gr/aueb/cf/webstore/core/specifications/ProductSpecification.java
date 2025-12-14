@@ -109,4 +109,11 @@ public class ProductSpecification {
         };
     }
 
+    public static Specification<Product> isActive(Boolean isActive) {
+        return (root, query, cb) -> {
+            if (isActive == null) return cb.conjunction();
+            return cb.equal(root.get("isActive"), isActive);
+        };
+    }
+
 }

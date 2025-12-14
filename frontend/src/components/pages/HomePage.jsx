@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import getProducts, { searchProducts } from "@/services/api.products.js";
+import { searchProducts } from "@/services/api.products.js";
 import { Button } from "@/components/ui/button.jsx";
 import { useSearchParams } from "react-router";
 import { formatPrice } from "@/utils/formatPrice.js";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const PAGE_SIZE = 12;
 
 const priceRanges = [{ label: "NVIDIA" }, { label: "AMD" }];
 
@@ -24,6 +26,8 @@ const HomePage = () => {
     document.title = "Arctic Builds";
   }, []);
 
+  const [page, setPage] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,6 +45,10 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    setPage(0);
+  }, [query, brands, minPrice, maxPrice]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function fetchProducts() {
@@ -54,6 +62,8 @@ const HomePage = () => {
         if (q) {
           filters.name = q;
         }
+
+        filters.isActive = true;
 
         if (brands.length === 1) {
           filters.brand = brands[0];
@@ -75,23 +85,31 @@ const HomePage = () => {
           filters.maxPrice = swap;
         }
 
-        let data;
+        const pageRes = await searchProducts({
+          ...filters,
+          page,
+          pageSize: PAGE_SIZE,
+          sortBy: "id",
+          sortDirection: "ASC",
+        });
 
-        if (Object.keys(filters).length > 0) {
-          data = await searchProducts(filters);
-        } else {
-          data = await getProducts();
-        }
+        const serverItems = Array.isArray(pageRes?.data) ? pageRes.data : [];
+        const totalPages =
+          typeof pageRes?.totalPages === "number" ? pageRes.totalPages : 0;
+
+        let data = serverItems;
+        const next = page + 1 < totalPages;
 
         if (brands.length > 1) {
           const set = new Set(brands.map((b) => b.toUpperCase()));
-          data = (Array.isArray(data) ? data : []).filter((p) =>
+          data = data.filter((p) =>
             set.has(String(p?.brand ?? "").toUpperCase()),
           );
         }
 
         if (!cancelled) {
-          setProducts(Array.isArray(data) ? data : []);
+          setHasNext(next);
+          setProducts(data);
         }
       } catch (err) {
         if (!cancelled) {
@@ -111,7 +129,7 @@ const HomePage = () => {
     return () => {
       cancelled = true;
     };
-  }, [query, brands, minPrice, maxPrice]);
+  }, [query, brands, minPrice, maxPrice, page]);
 
   return (
     <main
@@ -253,6 +271,30 @@ const HomePage = () => {
                 </div>
               </article>
             ))}
+          </div>
+        )}
+
+        {!loading && !error && (
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === 0}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+            >
+              Prev
+            </Button>
+
+            <span className="text-sm text-ws-gray">Page {page + 1}</span>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!hasNext}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
           </div>
         )}
       </section>

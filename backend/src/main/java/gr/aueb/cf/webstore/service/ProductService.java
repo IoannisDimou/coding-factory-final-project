@@ -158,7 +158,8 @@ public class ProductService implements IProductService {
                 .and(ProductSpecification.categoryNameLike(filters.getCategory()))
                 .and(ProductSpecification.priceBetween(filters.getMinPrice(), filters.getMaxPrice()))
                 .and(ProductSpecification.brandLike(filters.getBrand()))
-                .and(ProductSpecification.specLike(filters.getSpecName(), filters.getSpecValue()));
+                .and(ProductSpecification.specLike(filters.getSpecName(), filters.getSpecValue()))
+                .and(ProductSpecification.isActive(filters.getIsActive()));
     }
 
     @Override
