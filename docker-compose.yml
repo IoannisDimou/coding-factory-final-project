@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.4
+    image: mysql:8.0
     environment:
       MYSQL_DATABASE: ${MYSQL_DB}
       MYSQL_USER: ${MYSQL_USER}
@@ -52,7 +52,7 @@ services:
       mailpit:
         condition: service_started
     environment:
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: docker
 
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306

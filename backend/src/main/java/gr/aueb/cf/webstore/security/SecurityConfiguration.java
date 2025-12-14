@@ -55,7 +55,8 @@ public class SecurityConfiguration {
                                 "/v3/api-docs.yaml",
                                 "/swagger-resources/**",
                                 "/configuration/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/images/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
