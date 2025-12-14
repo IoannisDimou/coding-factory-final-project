@@ -32,8 +32,8 @@ export default async function getUsers(pageSize = 500) {
   return Array.isArray(body.data) ? body.data : [];
 }
 
-export async function getUser(id) {
-  const res = await fetch(`${API_USERS_URL}/${id}`, {
+export async function getUser(uuid) {
+  const res = await fetch(`${API_USERS_URL}/${uuid}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

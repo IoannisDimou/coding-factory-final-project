@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button.jsx";
-import { Pencil, Check, X, Plus } from "lucide-react";
-import getUsers, { updateUser } from "@/services/api.users.js";
+import { Pencil, Check, X } from "lucide-react";
+import getUsers, { getUser, updateUser } from "@/services/api.users.js";
 
 const VITE_API_USERS_URL = import.meta.env.VITE_API_USERS_URL;
 
@@ -19,6 +19,8 @@ const UserPanel = () => {
   const [error, setError] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
   const [editValues, setEditValues] = useState({});
+  const [searchId, setSearchId] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -50,6 +52,46 @@ const UserPanel = () => {
       cancelled = true;
     };
   }, []);
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+
+    const id = String(searchId).trim();
+    if (!id) return;
+
+    setSearchLoading(true);
+    setError(null);
+    setEditingUserId(null);
+    setEditValues({});
+
+    try {
+      const one = await getUser(id);
+      setUsers(one ? [one] : []);
+    } catch (err) {
+      setUsers([]);
+      setError(err instanceof Error ? err.message : "Failed to fetch user");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const handleClearSearch = async () => {
+    setSearchId("");
+    setSearchLoading(true);
+    setError(null);
+    setEditingUserId(null);
+    setEditValues({});
+
+    try {
+      const data = await getUsers();
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setUsers([]);
+      setError(err instanceof Error ? err.message : "Failed to fetch users");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   const handleEdit = (user) => {
     setEditingUserId(user.id);
@@ -97,8 +139,35 @@ const UserPanel = () => {
 
   return (
     <div className="p-8">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl mb-6">Users</h1>
+      <div className="flex flex-col gap-3 mb-4">
+        <h1 className="text-2xl mb-2">Users</h1>
+
+        <form onSubmit={handleSearch} className="flex items-center gap-2">
+          <input
+            type="text"
+            value={searchId}
+            onChange={(e) => setSearchId(e.target.value)}
+            placeholder="Search user by uuid."
+            className="border px-3 py-2 rounded w-64"
+          />
+
+          <Button
+            type="submit"
+            variant="outline"
+            disabled={searchLoading || !String(searchId).trim()}
+          >
+            {searchLoading ? "Searching..." : "Search"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleClearSearch}
+            disabled={searchLoading && !String(searchId).trim()}
+          >
+            Clear
+          </Button>
+        </form>
       </div>
 
       {loading && <p className="text-sm text-ws-gray">Loading users...</p>}
