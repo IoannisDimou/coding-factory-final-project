@@ -93,12 +93,12 @@ export default function ProductPage() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="md:col-span-2 space-y-3">
-          <div className="aspect-[4/3] w-full rounded-lg bg-secondary overflow-hidden flex items-center justify-center">
+          <div className="relative aspect-[4/3] w-full overflow-hidden flex items-center justify-center bg-card p-3 rounded-lg">
             {product.image ? (
               <img
                 src={getImageUrl(product.image)}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             ) : (
               <span className="text-xs text-ws-gray">No image</span>

@@ -34,6 +34,7 @@ const HomePage = () => {
   const [brands, setBrands] = useState([]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [totalPages, setTotalPages] = useState(0);
 
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") ?? "";
@@ -109,6 +110,7 @@ const HomePage = () => {
 
         if (!cancelled) {
           setHasNext(next);
+          setTotalPages(totalPages);
           setProducts(data);
         }
       } catch (err) {
@@ -206,7 +208,7 @@ const HomePage = () => {
         <header className="mb-6 mt-1 md:mt-[6px]">
           <h1 className="text-3xl font-bold">
             Find the
-            <span className="inline-block mx-1 font-bold bg-gradient-to-r from-ws-ice to-cyan-300 bg-clip-text text-transparent">
+            <span className="inline-block mx-2 font-bold text-cyan-300 ">
               Cooolest
             </span>
             GPUs at the BEST prices
@@ -230,12 +232,12 @@ const HomePage = () => {
                 key={product.id}
                 className="flex flex-col rounded-lg border border-border bg-card hover:shadow-md transition-shadow"
               >
-                <div className="relative aspect-[4/3] w-full bg-secondary rounded-t-lg">
+                <div className="relative aspect-[4/3] w-full overflow-hidden flex items-center justify-center bg-card p-3 rounded-t-lg">
                   {product.image ? (
                     <img
                       src={getImageUrl(product.image)}
                       alt={product.name}
-                      className="absolute inset-0  w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     <span className="text-xs text-ws-gray">No image</span>
@@ -274,7 +276,7 @@ const HomePage = () => {
           </div>
         )}
 
-        {!loading && !error && (
+        {!loading && !error && totalPages > 1 && (
           <div className="mt-8 flex items-center justify-center gap-3">
             <Button
               variant="outline"
@@ -285,7 +287,9 @@ const HomePage = () => {
               Prev
             </Button>
 
-            <span className="text-sm text-ws-gray">Page {page + 1}</span>
+            <span className="text-sm text-ws-gray">
+              Page {page + 1} / {totalPages}
+            </span>
 
             <Button
               variant="outline"
