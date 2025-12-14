@@ -13,10 +13,11 @@ import {
 } from "@/services/api.orders.js";
 import { formatPrice } from "@/utils/formatPrice.js";
 
+const TAX_RATE = 0.24;
+
 export default function CartPage() {
   const navigate = useNavigate();
-  const { items, updateQuantity, removeItem, clearCart, totalPrice } =
-    useCart();
+  const { items, updateQuantity, removeItem, clearCart } = useCart();
 
   const { isAuthenticated, accessToken, user } = useAuth();
 
@@ -43,6 +44,14 @@ export default function CartPage() {
       </div>
     );
   }
+
+  const subtotal = items.reduce(
+    (sum, item) => sum + Number(item.price) * Number(item.quantity),
+    0,
+  );
+
+  const taxTotal = subtotal * TAX_RATE;
+  const grandTotal = subtotal + taxTotal;
 
   const handleCheckout = async (a) => {
     a.preventDefault();
@@ -115,7 +124,7 @@ export default function CartPage() {
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between gap-4 border-b border-border pb-3"
+            className="flex items-center justify-between gap-4  pb-3"
           >
             <div className="flex items-center gap-3">
               {item.image && (
@@ -158,14 +167,34 @@ export default function CartPage() {
         ))}
       </div>
 
-      <div className="flex justify-between items-center">
-        <span className="text-base font-semibold">
-          Total: {formatPrice(totalPrice)} €
-        </span>
+      <div className="pt-4 space-y-2">
+        <div className="flex justify-between text-sm text-ws-gray">
+          <span>Subtotal</span>
+          <span>{formatPrice(subtotal)} €</span>
+        </div>
 
-        <Button type="button" variant="ghost" size="sm" onClick={clearCart}>
-          Clear cart
-        </Button>
+        <div className="flex justify-between text-sm text-ws-gray">
+          <span>Tax ({Math.round(TAX_RATE * 100)}%)</span>
+          <span>{formatPrice(taxTotal)} €</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-base font-semibold">Total</span>
+          <span className="text-base font-semibold">
+            {formatPrice(grandTotal)} €
+          </span>
+        </div>
+
+        <div className="flex justify-end pt-5">
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={clearCart}
+          >
+            Clear cart
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 mt-4">
