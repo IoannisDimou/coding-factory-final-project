@@ -8,18 +8,20 @@ function getAuthHeaders() {
   };
 }
 
-export default async function getCategories() {
-  const res = await fetch(`${API_CATEGORIES_URL}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...getAuthHeaders(),
+export default async function getCategories(pageSize = 500) {
+  const res = await fetch(
+    `${API_CATEGORIES_URL}?page=0&pageSize=${pageSize}&size=${pageSize}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
+      },
     },
-  });
+  );
 
   if (!res.ok) {
-    if (res.status === 401)
-      throw new Error("Unauthorized (missing or invalid token)");
+    if (res.status === 401) throw new Error("Unauthorized");
     throw new Error("Failed to fetch categories");
   }
 
@@ -38,8 +40,7 @@ export async function createCategory(data) {
   });
 
   if (!res.ok) {
-    if (res.status === 401)
-      throw new Error("Unauthorized (missing or invalid token)");
+    if (res.status === 401) throw new Error("Unauthorized");
     throw new Error("Failed to create category");
   }
 
@@ -57,8 +58,7 @@ export async function updateCategory(id, data) {
   });
 
   if (!res.ok) {
-    if (res.status === 401)
-      throw new Error("Unauthorized (missing or invalid token)");
+    if (res.status === 401) throw new Error("Unauthorized");
     throw new Error("Failed to update category");
   }
 

@@ -9,18 +9,21 @@ function getAuthHeaders() {
   };
 }
 
-export default async function getUsers() {
-  const res = await fetch(`${API_USERS_URL}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...getAuthHeaders(),
+export default async function getUsers(pageSize = 500) {
+  const res = await fetch(
+    `${API_USERS_URL}?page=0&pageSize=${pageSize}&size=${pageSize}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
+      },
     },
-  });
+  );
 
   if (!res.ok) {
     if (res.status === 401) {
-      throw new Error("Unauthorized (missing or invalid token)");
+      throw new Error("Unauthorized");
     }
     throw new Error("Failed to fetch users");
   }
@@ -40,7 +43,7 @@ export async function getUser(id) {
 
   if (!res.ok) {
     if (res.status === 401) {
-      throw new Error("Unauthorized (missing or invalid token)");
+      throw new Error("Unauthorized");
     }
     throw new Error("Failed to fetch user");
   }
@@ -67,23 +70,4 @@ export async function updateUser(id, data) {
   }
 
   return JSON.parse(text);
-}
-
-export async function createUser(data) {
-  const res = await fetch(`${API_USERS_URL}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...getAuthHeaders(),
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    if (res.status === 401)
-      throw new Error("Unauthorized (missing or invalid token)");
-    throw new Error("Failed to create user");
-  }
-
-  return res.json();
 }

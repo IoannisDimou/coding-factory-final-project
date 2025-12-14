@@ -86,7 +86,7 @@ export async function getProductsPage({ page = 0, size = 12 } = {}) {
   const res = await fetch(
     `${API_PRODUCTS_URL}/products?page=${page}&size=${size}`,
   );
-  if (!res.ok) throw new Error("Failed to fetch products (page)");
+  if (!res.ok) throw new Error("Failed to fetch products");
 
   return res.json();
 }
