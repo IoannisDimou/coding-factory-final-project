@@ -44,7 +44,6 @@ const ProductPanel = () => {
           setProducts(items);
           setTotalPages(tp);
 
-          // if you end up on a dead page, snap back
           if (tp > 0 && page >= tp) setPage(tp - 1);
         }
       } catch (err) {

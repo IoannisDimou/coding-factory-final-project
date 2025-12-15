@@ -2,15 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { Button } from "@/components/ui/button.jsx";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table.jsx";
-import { Pencil, Trash2 } from "lucide-react";
-import {
   createProduct,
   getProduct,
   updateProduct,
@@ -50,11 +41,6 @@ export default function ProductForm() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const specs = useMemo(() => {
-    const s = form?.specs ?? form?.productSpecs ?? form?.productSpecsList ?? [];
-    return Array.isArray(s) ? s : [];
-  }, [form]);
 
   const fileInputRef = useRef(null);
 
@@ -352,39 +338,6 @@ export default function ProductForm() {
           />
           Active
         </label>
-
-        {specs.length > 0 && (
-          <div className="pt-4">
-            <h2 className="font-semibold mb-2">Specifications (read-only)</h2>
-            <Table>
-              <TableHeader className="bg-ws-white">
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Spec</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {specs.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell>{s.id}</TableCell>
-                    <TableCell>{s.name}</TableCell>
-                    <TableCell>{s.value}</TableCell>
-                    <TableCell className="flex gap-2 justify-end">
-                      <Button size="icon" variant="outline" disabled>
-                        <Pencil />
-                      </Button>
-                      <Button size="icon" variant="destructive" disabled>
-                        <Trash2 />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
 
         <Button type="submit" disabled={loading}>
           {loading
