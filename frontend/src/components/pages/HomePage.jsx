@@ -9,7 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const PAGE_SIZE = 12;
 
-const priceRanges = [{ label: "NVIDIA" }, { label: "AMD" }];
+const brandsData = [{ label: "NVIDIA" }, { label: "AMD" }];
 
 function getImageUrl(image) {
   if (!image) return null;
@@ -185,7 +185,7 @@ const HomePage = () => {
           </h3>
 
           <div className="space-y-2 text-sm">
-            {priceRanges.map((range) => (
+            {brandsData.map((range) => (
               <label
                 key={range.label}
                 className="flex items-center gap-2 cursor-pointer"
