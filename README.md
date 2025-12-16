@@ -4,7 +4,7 @@ The app simulates an e-commerce flow for PC hardware (GPUs catalog): browse prod
 
 ---
 
-## Table of Contents
+### Table of Contents
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Security](#security)
@@ -12,7 +12,7 @@ The app simulates an e-commerce flow for PC hardware (GPUs catalog): browse prod
 - [Default URLs](#default-urls)
 - [Deafult Admin User credentials](#default-admin-user-credentials)
 - [Email delivery](#email-delivery)
-- [Project Rules / Decisions](#project-rules--decisions)
+- [Screenshots](#screenshots)
 
 ---
 
