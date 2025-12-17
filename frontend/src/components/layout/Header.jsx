@@ -53,13 +53,16 @@ const Header = () => {
     const t = setTimeout(async () => {
       try {
         setSuggestionsLoading(true);
-        const data = await searchProducts({
+        const res = await searchProducts({
           name: q,
+          isActive: true,
           page: 0,
           pageSize: 6,
         });
+        const items = Array.isArray(res?.data) ? res.data : [];
+
         if (!cancelled) {
-          setSuggestions(Array.isArray(data) ? data : []);
+          setSuggestions(items);
           setSuggestionsOpen(true);
         }
       } catch {
@@ -170,20 +173,20 @@ const Header = () => {
                         key={product.id}
                         asChild
                         variant="ghost"
-                        size="sm"
-                        className="w-full justify-start rounded-none px-4 py-3"
+                        size="default"
+                        className="w-full justify-start rounded-none px-7 py-6"
                       >
                         <Link
                           to={`/products/${product.id}`}
                           onClick={() => setSuggestionsOpen(false)}
-                          className="flex items-center gap-3 w-full"
+                          className="flex items-center gap-3 w-full min-h-20"
                         >
-                          <div className="h-10 w-10 rounded-md bg-secondary overflow-hidden shrink-0 flex items-center justify-center">
+                          <div className="h-15 w-15 rounded-md bg-secondary overflow-hidden shrink-0 flex items-center justify-center">
                             {product.image ? (
                               <img
                                 src={getImageUrl(product.image)}
                                 alt={product.name}
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-contain p-2 bg-card"
                               />
                             ) : (
                               <span className="text-[10px] text-ws-gray">
