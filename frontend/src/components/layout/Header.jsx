@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button.jsx";
 import logo from "@/assets/ArcticBuildsLogo.png";
 import { useAuth } from "@/hooks/useAuth.js";
 import { useCart } from "@/hooks/useCart.js";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { searchProducts } from "@/services/api.products.js";
 
 const links = [
@@ -32,6 +32,8 @@ const Header = () => {
     logoutUser();
     navigate("/");
   };
+
+  const searchBox = useRef(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -94,6 +96,19 @@ const Header = () => {
     }
   };
 
+  useEffect(() => {
+    if (!suggestionsOpen) return;
+
+    function onDocMouseDown(e) {
+      if (!searchBox.current) return;
+      if (searchBox.current.contains(e.target)) return;
+      setSuggestionsOpen(false);
+    }
+
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, [suggestionsOpen]);
+
   return (
     <header className="bg-background fixed top-0 inset-x-0 z-40">
       <div className="container mx-auto px-4 sm:px-6">
@@ -110,6 +125,7 @@ const Header = () => {
 
           <form
             role="search"
+            ref={searchBox}
             className="order-3 w-full md:order-2 md:flex-1 md:w-auto mt-1 relative"
             onSubmit={handleSearch}
           >
@@ -181,7 +197,7 @@ const Header = () => {
                           onClick={() => setSuggestionsOpen(false)}
                           className="flex items-center gap-3 w-full min-h-20"
                         >
-                          <div className="h-15 w-15 rounded-md bg-secondary overflow-hidden shrink-0 flex items-center justify-center">
+                          <div className="h-16 w-16 rounded-md bg-secondary overflow-hidden shrink-0 flex items-center justify-center">
                             {product.image ? (
                               <img
                                 src={getImageUrl(product.image)}
