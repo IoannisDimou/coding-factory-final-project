@@ -86,31 +86,21 @@ The app simulates an e-commerce flow for PC hardware (GPUs catalog): browse prod
 ### Prerequisites
 - Docker installed
 
-### 1) Create environment file
-From repository root:
-1. Copy the example env:
-    - `./.env.docker.example`
-2. Create:
-    - `./.env.docker`
-    - (cp .env.docker.example .env.docker)
+### 1) Create an environment file
+From the repository root:
+- `cp .env.docker.example .env.docker`
 
-### 2) Build and start
-From repository root:
-```bash
-docker compose --env-file .env.docker up -d --build
-```
+### 2) Build and run the containers
+- `docker compose --env-file .env.docker up -d --build`
 
-#### If something breaks (common reset commands)
-```bash
-docker compose --env-file .env.docker down -v
-docker compose --env-file .env.docker up -d --build --force-recreate
-```
+### If something breaks, try:
+- `docker compose --env-file .env.docker down -v` (removes volumes)
+- `docker compose --env-file .env.docker up -d --build --force-recreate`
 
-#### Recreate only one service:
-```bash
-docker compose --env-file .env.docker up -d --build --force-recreate frontend
-docker compose --env-file .env.docker up -d --build --force-recreate backend
-```
+### Recreate only one container:
+- `docker compose --env-file .env.docker up -d --build --force-recreate frontend`
+- `docker compose --env-file .env.docker up -d --build --force-recreate backend`
+
 ---
 ## Default URLs
 
